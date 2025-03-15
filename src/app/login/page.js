@@ -1,11 +1,13 @@
-'use client';
+"use client";
 
 import { useState } from "react";
+import { useRouter } from 'next/navigation';
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -15,8 +17,10 @@ export default function Login() {
       setError("Please fill in both fields.");
     } else {
       setError(""); // Reset error if fields are filled
-      // Proceed with the login logic here
       console.log("Form submitted", { email, password });
+
+      // Navigate only if no errors
+      router.push("/profile");
     }
   };
 
