@@ -1,22 +1,27 @@
-'use client';
+"use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
+  const router = useRouter(); // Initialize router
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Error check for empty fields
     if (!email || !password) {
       setError("Please fill in both fields.");
     } else {
       setError(""); // Reset error if fields are filled
-      // Proceed with the login logic here
       console.log("Form submitted", { email, password });
+
+      // Simulate login (replace with actual authentication logic)
+      setTimeout(() => {
+        router.push("/home"); // Redirect to home page
+      }, 500);
     }
   };
 
