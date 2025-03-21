@@ -7,7 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
-  const router = useRouter(); // Initialize router
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -18,10 +18,8 @@ export default function Login() {
       setError(""); // Reset error if fields are filled
       console.log("Form submitted", { email, password });
 
-      // Simulate login (replace with actual authentication logic)
-      setTimeout(() => {
-        router.push("/home"); // Redirect to home page
-      }, 500);
+      // Navigate only if no errors
+      router.push("/profile");
     }
   };
 

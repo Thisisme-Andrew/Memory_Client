@@ -1,0 +1,51 @@
+--Create groups of global states (ex. authenications variables)--
+1. Go to redux->features and create name + slice. Ex Authenication variables = authSlice.js
+2. When creating slice:
+  - splices need a name and intitial state, you can add categories if you like
+  - reducers are basically the functions that you will use to change the state defined in initial state
+
+Use this template:
+  import  { createSlice, PayloadAction } from "@reduxjs/toolkit"
+
+  export const authSlice = createSlice({
+    name: "auth",
+    initialState: {
+      loggedIn: false,
+      email: "",
+      userID: "",
+      isAdmin: false
+    },
+    reducers: {
+      logOut: () => {
+        return intialState;
+      },
+      logIn: (state, action) => {
+        return {
+          loggedIn: true,
+          email: action.payload.email,
+          userID: action.payload.userID,
+          isAdmin: action.payload.isAdmin
+        }
+      }
+    }
+  })
+
+3. import and add the reducer in the store.js file.
+  import authReducer from './features/authSlice';
+  
+  export const store = configureStore({
+      reducer: {
+        authReducer,
+      }
+  })
+
+--To access the global state--
+import { useSelector } from "react-redux";
+
+const username = useSelector((state) => state.reducerName.propertyname)
+
+--To change the global state--
+import { useDispatch } from "react-redux";
+
+const dispatch = useDispatch()
+dispatch(slice's_reducers_name(arguments))
