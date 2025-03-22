@@ -1,6 +1,9 @@
-'use client';
+"use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/store.js"; // Import Redux action
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -8,6 +11,8 @@ export default function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
+  const dispatch = useDispatch();
+  const router = useRouter();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -20,9 +25,19 @@ export default function Signup() {
     } else if (password.length < 6) {
       setError("Password must be at least 6 characters.");
     } else {
-      setError(""); // Reset error if all checks pass
-      // Proceed with the signup logic here
-      console.log("Form submitted", { fullName, email, password });
+      setError(""); 
+
+      const newUser = {
+        fullName,
+        email,
+        profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
+      };
+
+ 
+      dispatch(setUser(newUser));
+
+
+      router.push("/profile");
     }
   };
 

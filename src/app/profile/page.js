@@ -1,35 +1,33 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
+import { useRouter } from "next/navigation";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/store.js"; // Import logout action
 
 export default function Profile() {
-  const [user, setUser] = useState({
-    fullName: "John Doe",
-    email: "johndoe@example.com",
-    profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
-  });
-
+  const user = useSelector((state) => state.auth.user); // Get user data from Redux
+  const dispatch = useDispatch();
   const router = useRouter();
 
   const handleLogout = () => {
-    router.push('/'); // Redirects to the main page
+    dispatch(logout()); // Clear Redux state
+    router.push("/"); // Redirect to the main page
   };
+
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
+    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-sm">
-        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white font-serif">The Memory</h1>
+        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">The Memory</h1>
         <h2 className="text-xl font-semibold">User Profile</h2>
 
         <div className="flex flex-col items-center gap-4 w-full">
           <img 
-            src={user.profilePic} 
+            src={user.profilePic || "https://via.placeholder.com/150"} 
             alt="Profile" 
             className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
           />
-          <h2 className="text-lg font-bold">{user.fullName}</h2>
-          <p className="text-gray-500">{user.email}</p>
+          <h2 className="text-lg font-bold">{user.fullName || "Guest User"}</h2>
+          <p className="text-gray-500">{user.email || "No email available"}</p>
 
           <button 
             onClick={handleLogout} 
