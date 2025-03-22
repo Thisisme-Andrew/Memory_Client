@@ -1,17 +1,18 @@
-import { configureStore, createSlice } from "@reduxjs/toolkit";
+import { createSlice, configureStore } from "@reduxjs/toolkit";
 
 const authSlice = createSlice({
   name: "auth",
   initialState: {
+    user: null, // Currently logged-in user
+    fullName: "", // ✅ Added fullName
     email: "",
     password: "",
-    user: {
-      fullName: "",
-      email: "",
-      profilePic: "",
-    },
+    registeredUsers: [], // Store signed-up users
   },
   reducers: {
+    setFullName: (state, action) => {
+      state.fullName = action.payload;
+    },
     setEmail: (state, action) => {
       state.email = action.payload;
     },
@@ -21,15 +22,19 @@ const authSlice = createSlice({
     setUser: (state, action) => {
       state.user = action.payload;
     },
+    registerUser: (state, action) => {
+      state.registeredUsers.push(action.payload); // Add new user to list
+    },
     logout: (state) => {
+      state.user = null;
+      state.fullName = "";
       state.email = "";
       state.password = "";
-      state.user = { fullName: "", email: "", profilePic: "" }; 
     },
   },
 });
 
-export const { setEmail, setPassword, setUser, logout } = authSlice.actions;
+export const { setFullName, setEmail, setPassword, setUser, registerUser, logout } = authSlice.actions;
 
 const store = configureStore({
   reducer: {

@@ -8,6 +8,7 @@ import { setEmail, setPassword, setUser } from "../redux/store.js"; // Import Re
 export default function Login() {
   const email = useSelector((state) => state.auth.email);
   const password = useSelector((state) => state.auth.password);
+  const registeredUsers = useSelector((state) => state.auth.registeredUsers); // Get registered users from Redux
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -18,18 +19,22 @@ export default function Login() {
 
     if (!email || !password) {
       setError("Please fill in both fields.");
+      return;
+    }
+
+    // Check if the email exists in registeredUsers
+    const user = registeredUsers.find((user) => user.email === email);
+
+    if (!user) {
+      setError("Email not recognized.");
+    } else if (user.password !== password) {
+      setError("Incorrect password.");
     } else {
       setError("");
-      console.log("Form submitted", { email, password });
+      console.log("Login successful!", { email, password });
 
-      const mockUser = {
-        fullName: "John Doe",
-        email: email,
-        profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
-      };
-
-      // Save user data in Redux store
-      dispatch(setUser(mockUser));
+      // Save logged-in user data in Redux
+      dispatch(setUser(user));
 
       router.push("/profile");
     }
