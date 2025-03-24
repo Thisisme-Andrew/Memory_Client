@@ -27,6 +27,12 @@ export default function Home() {
 
     // Add a marker on the map (optional)
     L.marker([51.5, -0.09]).addTo(map).bindPopup("<b>Hello world!</b>").openPopup();
+    const calgaryMarker = L.marker([51.0447, -114.0719]).addTo(map).bindPopup("<b>Calgary</b><br>Click to visit Calgary page");
+
+    // Add click event on the marker to redirect to /calgary/page.js
+    calgaryMarker.on('click', () => {
+      router.push('/calgary');
+    });
 
     // Cleanup the map instance on unmount
     return () => {
