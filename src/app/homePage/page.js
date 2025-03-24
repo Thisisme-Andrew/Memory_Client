@@ -27,7 +27,16 @@ export default function Home() {
 
     // Add a marker on the map (optional)
     L.marker([51.5, -0.09]).addTo(map).bindPopup("<b>Hello world!</b>").openPopup();
-    const calgaryMarker = L.marker([51.0447, -114.0719]).addTo(map).bindPopup("<b>Calgary</b><br>Click to visit Calgary page");
+    const starIcon = L.divIcon({
+      className: 'leaflet-star-icon', // Assign a custom class name
+      html: '<div style="font-size: 32px; color: gold; transform: rotate(0deg);">&#9733;</div>', // HTML for a star
+      iconSize: [40, 40], // Icon size
+      iconAnchor: [20, 20], // Anchor the icon at the center
+    });
+
+    // Add the marker with the custom star icon
+    const calgaryMarker = L.marker([51.0447, -114.0719], { icon: starIcon }).addTo(map)
+      .bindPopup("<b>Calgary</b><br>Click to visit Calgary page");
 
     // Add click event on the marker to redirect to /calgary/page.js
     calgaryMarker.on('click', () => {
