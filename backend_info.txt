@@ -1,0 +1,75 @@
+BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
+
+I only have functions set up for the users so far, the endpoints and descriptions are here :
+  - For all users you need baseURL + /api/users + endpoint specific extension
+
+-- USERS --
+1. createUser():
+  - endpoint: '/register'
+  - type: post
+  - Input and types: 
+    - An object with:
+      - firstName : string
+      - lastName : string
+      - email : string
+      - password : string
+  - Output:
+    - in the data.body there is an object with the user's info with the userID (no password is returned)
+
+2. loginUser
+  - endpoint: '/login'
+  - type: get
+  - Input and types
+    - An object with:
+      - email: string
+      - password: string
+  - Output:
+    - in the data.body there should be object with the user's information, otherwise there will be an error in data
+
+3. editUser
+  - endpoint: '/edit'
+  - type: put
+  - Input and types
+    - An object with: 
+      - firstName : string
+      - lastName : string
+      - email : string
+      - userID : number
+    - Output:
+      - in data.body, just some general information, probably nothing useful
+    
+4. removeUser
+  - endpoint: '/remove'
+  - type: delete
+  - Input and types:
+    - an object with:
+      userID = number
+  - Output:
+    - in data.body, just some general information, probably nothing useful
+
+5. retreiveUser
+  - endpoint: '/:id'
+  - type: get
+  - Input and types: 
+    - an object with:
+      userID = number
+  - Output: 
+    - in the data.body there is an object with the user's info with the userID (no password is returned)
+
+6. retreiveAllUsers
+  - endpoint: /
+  - type: get
+  - Input and types:
+    - none
+  - Output
+    - in data.body it should be an array of all the users currently without the passwords
+
+7. changePassword
+  - endpoint: '/reset-password'
+  - type: put
+  - Input and types: 
+    - an object with:
+      email: string
+      password: string
+  - Output:
+    - in data.body, just some general information, probably nothing useful
