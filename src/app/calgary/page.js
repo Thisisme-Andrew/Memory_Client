@@ -1,56 +1,144 @@
-// pages/calgary/page.js
-
 "use client"; // Add this to indicate this is a Client Component
 
 export default function CalgaryPage() {
-    return (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
-        {/* Page Header */}
-        <h1 className="text-4xl font-semibold text-gray-800 mb-6">Welcome to Calgary!</h1>
-        
-        {/* City Information Section */}
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg text-center mb-6">
-          <h2 className="text-2xl font-bold text-gray-800 mb-4">About Calgary</h2>
-          <p className="text-gray-600">
-            Calgary is a vibrant city in the province of Alberta, Canada. Known for its stunning natural landscapes,
-            Calgary is home to the beautiful Rocky Mountains, world-class ski resorts, and iconic landmarks like the Calgary Tower.
-          </p>
-          <p className="text-gray-600 mt-4">
-            Calgary also has a rich cultural scene, with various festivals, museums, and art galleries. It’s known for being the gateway to the Canadian Rockies and offering many outdoor activities, including hiking, biking, and skiing.
-          </p>
-        </div>
-  
-        {/* Calgary Image */}
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg text-center mb-6">
-          <img
-            src="https://upload.wikimedia.org/wikipedia/commons/a/aa/Calgary_skyline_at_night.jpg"
-            alt="Calgary Skyline"
-            className="rounded-lg w-full h-auto mb-4"
-          />
-          <p className="text-gray-500">The stunning Calgary skyline at night.</p>
-        </div>
-  
-        {/* Fun Facts */}
-        <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg text-center mb-6">
-          <h3 className="text-xl font-semibold text-gray-800 mb-4">Fun Facts About Calgary</h3>
-          <ul className="list-disc text-left text-gray-600 space-y-2">
-            <li>Calgary is home to the Calgary Stampede, one of the largest rodeo events in the world.</li>
-            <li>The Calgary Tower, once the tallest structure in Canada, is located in the downtown area.</li>
-            <li>It has over 1,000 parks, making it one of the greenest cities in Canada.</li>
-            <li>Calgary has one of the most affordable housing markets in Canada compared to other major cities.</li>
-          </ul>
-        </div>
-  
-        {/* Footer */}
-        <div className="mt-8">
-          <button
-            onClick={() => window.history.back()} // Go back to the previous page
-            className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
-          >
-            Go Back
-          </button>
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+      {/* Profile Picture */}
+      <a href="/profile" className="absolute top-4 right-4">
+        <img
+          src="https://via.placeholder.com/50" // Replace this with the actual URL of the profile picture
+          alt="Profile"
+          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
+        />
+      </a>
+
+      {/* "The Memory" Text */}
+      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
+        The Memory
+      </div>
+
+      {/* Go Back Button */}
+      <div className="absolute top-16 left-4">
+        <button
+          onClick={() => window.history.back()} // Go back to the previous page
+          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+        >
+          Go Back
+        </button>
+      </div>
+
+      {/* Page Header */}
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Calgary</h1>
+      
+      {/* Search Box */}
+      <div className="bg-white text-blue-600 shadow-lg rounded-lg p-4 w-full max-w-lg text-center mb-6">
+        <input
+          type="text"
+          placeholder="Search for something in Calgary..."
+          className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+      </div>
+
+      {/* Gallery Title */}
+      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</h2>
+
+      {/* Horizontal Image Gallery Section */}
+      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
+        <div className="flex space-x-4 min-w-max">
+          {/* Red boxes for initial view with smaller size */}
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+
+          {/* White boxes for scrolling further */}
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
         </div>
       </div>
-    );
-  }
-  
+
+      {/* Gallery Title */}
+      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 2</h2>
+
+      {/* Horizontal Image Gallery Section */}
+      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
+        <div className="flex space-x-4 min-w-max">
+          {/* Red boxes for initial view with smaller size */}
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+
+          {/* White boxes for scrolling further */}
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Gallery Title */}
+      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 3</h2>
+
+      {/* Horizontal Image Gallery Section */}
+      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
+        <div className="flex space-x-4 min-w-max">
+          {/* Red boxes for initial view with smaller size */}
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+
+          {/* White boxes for scrolling further */}
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* Gallery Title */}
+      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 4</h2>
+
+      {/* Horizontal Image Gallery Section */}
+      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
+        <div className="flex space-x-4 min-w-max">
+          {/* Red boxes for initial view with smaller size */}
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+
+          {/* White boxes for scrolling further */}
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
+        </div>
+      </div>
+
+      {/* New Gallery Button */}
+      <a
+        href="#gallery-section" // Scroll to the gallery section
+        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
+      >
+        New Gallery
+      </a>
+
+      {/* Footer (Copyright info) */}
+      <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
+        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
+      </footer>
+    </div>
+  );
+}
