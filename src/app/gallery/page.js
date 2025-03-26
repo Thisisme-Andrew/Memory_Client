@@ -67,10 +67,6 @@ export default function Gallery() {
           </div>
         ))}
       </div>
-
-      <footer className="absolute bottom-6 text-sm opacity-80">
-        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
-      </footer>
     </div>
   );
 }

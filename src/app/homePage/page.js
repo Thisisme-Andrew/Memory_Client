@@ -4,8 +4,6 @@ import { useRouter } from "next/navigation";
 import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css"; // Import Leaflet styles
-//import "leaflet-google"; // Import leaflet-google plugin
-//import "leaflet-tilelayer-google"
 
 export default function Home() {
   const router = useRouter();
@@ -55,30 +53,31 @@ export default function Home() {
     };
   }, []);
 
-  // Optionally, you can add a redirect in case the user isn't logged in
-  useEffect(() => {
-    // You could check the user state here and redirect if not logged in
-  }, []);
-
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-4">Welcome to the Home Page!</h1>
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm text-center">
-        <p className="text-gray-500 mb-4">This is the main page of your application.</p>
-        <button
-          onClick={() => router.push("/profile")} // Navigate back to the profile page
-          className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
-        >
-          Go to Profile
-        </button>
-      </div>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 p-8">
+      <h1 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">Welcome to The Memory</h1>
+
+      {/* "View My Galleries" Button in the top left */}
+      <button
+  onClick={() => router.push('/gallery')} // Navigate to the gallery page
+  className="absolute top-4 left-4 bg-white text-blue-600 py-2 px-6 rounded-full hover:bg-gray-100 hover:text-blue-700 transition duration-300"
+>
+  View My Galleries
+</button>
+
 
       {/* Google Maps Container */}
       <div
         id="map"
         ref={mapContainerRef}
-        style={{ width: "100%", height: "400px", marginTop: "20px" }}
+        className="w-full max-w-3xl mt-8 rounded-lg shadow-lg"
+        style={{ height: "400px" }}
       ></div>
+
+      {/* Footer */}
+      <footer className="absolute bottom-4 left-4 text-sm text-white opacity-80">
+        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
+      </footer>
     </div>
   );
 }
