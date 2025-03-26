@@ -38,13 +38,20 @@ export default function Home() {
     const londonMarker = L.marker([51.5, -0.09], { icon: starIcon }).addTo(map)
       .bindPopup("<b>London</b><br>Click to visit London page");
 
+    const osakaMarker = L.marker([34.69, 135.5], { icon: starIcon }).addTo(map)
+      .bindPopup("<b>Osaka</b><br>Click to visit Osaka page");
+
     // Add click event on the marker to redirect to /calgary/page.js
     calgaryMarker.on('click', () => {
       router.push('/calgary');
     });
 
     londonMarker.on('click', () => {
-      router.push('/calgary');
+      router.push('/london');
+    });
+
+    osakaMarker.on('click', () => {
+      router.push('/osaka');
     });
 
     // Cleanup the map instance on unmount

@@ -1,6 +1,6 @@
 "use client"; // Add this to indicate this is a Client Component
 
-export default function CalgaryPage() {
+export default function LondonPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       {/* Profile Picture */}
@@ -28,20 +28,19 @@ export default function CalgaryPage() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Calgary</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">London</h1>
       
       {/* Search Box */}
       <div className="bg-white text-blue-600 shadow-lg rounded-lg p-4 w-full max-w-lg text-center mb-6">
         <input
           type="text"
-          placeholder="Search for something in Calgary..."
+          placeholder="Search for something in London..."
           className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
         />
       </div>
 
       {/* Gallery Title */}
-      {/*<h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</h2>*/}
-      <a href="/galleryview" className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</a>
+      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</h2>
 
       {/* Horizontal Image Gallery Section */}
       <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
