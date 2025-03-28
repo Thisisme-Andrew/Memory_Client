@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { registerUser, setEmail, setPassword, setFullName } from "../redux/store.js"; // Import Redux actions
+import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import { setUser } from "../redux/store.js"; // Redux actions
 
 export default function Signup() {
-  const fullName = useSelector((state) => state.auth.fullName);
-  const email = useSelector((state) => state.auth.email);
-  const password = useSelector((state) => state.auth.password);
-  const registeredUsers = useSelector((state) => state.auth.registeredUsers); // Get all users
-  const dispatch = useDispatch();
-  const router = useRouter();
-
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!fullName || !email || !password || !confirmPassword) {
@@ -34,23 +33,54 @@ export default function Signup() {
       return;
     }
 
-    if (registeredUsers.some((user) => user.email === email)) {
-      setError("Email already registered.");
-      return;
-    }
-
-    setError("");
-
-    const newUser = {
-      fullName,
+    const nameParts = fullName.trim().split(" ");
+    const user = {
+      firstName: nameParts[0],
+      lastName: nameParts.slice(1).join(" ") || "Unknown",
       email,
-      password, // Store the password for validation
-      profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
+      password,
     };
 
-    dispatch(registerUser(newUser)); // Save user in Redux
+    
+    try {
+      const response = await fetch(
+        `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(user),
+        }
+      );
 
-    router.push("/login");
+      const responseText = await response.text();
+      console.log("Raw Response:", responseText);
+
+      if (!response.ok) {
+        throw new Error(`Signup failed: ${responseText}`);
+      }
+
+      const data = JSON.parse(responseText); // Convert text to JSON
+
+      if (!data.body) {
+        throw new Error("Signup failed. Please try again.");
+      }
+
+      const newUser = {
+        userID: data.body.userID,
+        fullName: `${data.body.firstName} ${data.body.lastName}`,
+        email: data.body.email,
+        profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
+      };
+
+      dispatch(setUser(newUser)); // Store user info in Redux
+
+      router.push("/login"); // Redirect to login page
+    } catch (err) {
+      console.error("Signup Error:", err.message);
+      setError(err.message); // Display error message to user
+    }
   };
 
   return (
@@ -63,21 +93,21 @@ export default function Signup() {
             type="text"
             placeholder="Full Name"
             value={fullName}
-            onChange={(e) => dispatch(setFullName(e.target.value))} // ✅ Fix here
+            onChange={(e) => setFullName(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => dispatch(setEmail(e.target.value))}
+            onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => dispatch(setPassword(e.target.value))}
+            onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
