@@ -15,47 +15,45 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     if (!email || !password) {
       setError("Please fill in both fields.");
       return;
     }
-
+  
     try {
       const response = await fetch(
-        `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/login`,
+        `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
         {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
+          headers: { "Content-Type": "application/json" },
         }
       );
+      const data = await response.json();
+      console.log("API Response:", data);
 
       if (!response.ok) {
         throw new Error("Invalid email or password.");
       }
-
-      const data = await response.json();
-
-      if (!data.body) {
+  
+      if (!data.userID) {
         throw new Error("Login failed. Please try again.");
       }
-
+  
       const user = {
-        userID: data.body.userID,
-        fullName: `${data.body.firstName} ${data.body.lastName}`,
-        email: data.body.email,
-        profilePic: data.body.profilePic || "https://via.placeholder.com/150",
+        userID: data.userID,
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        profilePic: data.profilePic || "https://via.placeholder.com/150",
       };
-
+  
       dispatch(setUser(user)); 
       dispatch(setEmail(""));
       dispatch(setPassword(""));
-
+  
       router.push("/profile"); 
     } catch (err) {
+      console.error("Login Error:", err.message);
       setError(err.message);
     }
   };
