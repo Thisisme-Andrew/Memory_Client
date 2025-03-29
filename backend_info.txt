@@ -14,7 +14,7 @@ I only have functions set up for the users so far, the endpoints and description
       - email : string
       - password : string
   - Output:
-    - in the data.body there is an object with the user's info with the userID (no password is returned)
+    - in the data there is an object with the user's info with the userID (no password is returned)
 
 2. loginUser
   - endpoint: '/login'
@@ -24,7 +24,7 @@ I only have functions set up for the users so far, the endpoints and description
       - email: string
       - password: string
   - Output:
-    - in the data.body there should be object with the user's information, otherwise there will be an error in data
+    - in the data there should be object with the user's information, otherwise there will be an error in data
 
 3. editUser
   - endpoint: '/edit'
@@ -36,7 +36,7 @@ I only have functions set up for the users so far, the endpoints and description
       - email : string
       - userID : number
     - Output:
-      - in data.body, just some general information, probably nothing useful
+      - in data, just some general information, probably nothing useful
     
 4. removeUser
   - endpoint: '/remove'
@@ -45,7 +45,7 @@ I only have functions set up for the users so far, the endpoints and description
     - an object with:
       userID = number
   - Output:
-    - in data.body, just some general information, probably nothing useful
+    - in data, just some general information, probably nothing useful
 
 5. retreiveUser
   - endpoint: '/:id'
@@ -54,7 +54,7 @@ I only have functions set up for the users so far, the endpoints and description
     - an object with:
       userID = number
   - Output: 
-    - in the data.body there is an object with the user's info with the userID (no password is returned)
+    - in the data there is an object with the user's info with the userID (no password is returned)
 
 6. retreiveAllUsers
   - endpoint: /
@@ -62,7 +62,7 @@ I only have functions set up for the users so far, the endpoints and description
   - Input and types:
     - none
   - Output
-    - in data.body it should be an array of all the users currently without the passwords
+    - in data it should be an array of all the users currently without the passwords
 
 7. changePassword
   - endpoint: '/reset-password'
@@ -72,4 +72,4 @@ I only have functions set up for the users so far, the endpoints and description
       email: string
       password: string
   - Output:
-    - in data.body, just some general information, probably nothing useful
+    - in data, just some general information, probably nothing useful
