@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { setUser } from "../redux/store.js"; // Redux actions
+import { setUser } from "../redux/store.js"; 
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -41,7 +41,6 @@ export default function Signup() {
       password,
     };
 
-    
     try {
       const response = await fetch(
         `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/register`,
@@ -53,33 +52,41 @@ export default function Signup() {
           body: JSON.stringify(user),
         }
       );
-
+    
       const responseText = await response.text();
-      console.log("Raw Response:", responseText);
-
+      console.log("API Raw Response:", responseText);
+    
       if (!response.ok) {
-        throw new Error(`Signup failed: ${responseText}`);
+        throw new Error(`Signup failed: ${responseText || "Unknown error"}`);
       }
-
-      const data = JSON.parse(responseText); // Convert text to JSON
-
-      if (!data.body) {
-        throw new Error("Signup failed. Please try again.");
+    
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (err) {
+        console.error("JSON Parse Error:", err);
+        throw new Error("Invalid response format from server.");
       }
-
+    
+      console.log("API Response:", data);
+    
+      if (!data.userID) {
+        throw new Error("Signup succeeded, but no user ID was returned.");
+      }
+    
       const newUser = {
-        userID: data.body.userID,
-        fullName: `${data.body.firstName} ${data.body.lastName}`,
-        email: data.body.email,
+        userID: data.userID,
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
         profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
       };
-
-      dispatch(setUser(newUser)); // Store user info in Redux
-
-      router.push("/login"); // Redirect to login page
+    
+      dispatch(setUser(newUser));
+    
+      router.push("/login");
     } catch (err) {
       console.error("Signup Error:", err.message);
-      setError(err.message); // Display error message to user
+      setError(err.message);
     }
   };
 
