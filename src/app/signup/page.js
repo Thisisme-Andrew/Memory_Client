@@ -78,12 +78,12 @@ export default function Signup() {
         userID: data.userID,
         fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
-        profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
+        profilePic: data.profilePic || "https://via.placeholder.com/150",
       };
     
       dispatch(setUser(newUser));
     
-      router.push("/login");
+      router.push("/profile"); // 🚀 Redirects to profile after signup
     } catch (err) {
       console.error("Signup Error:", err.message);
       setError(err.message);

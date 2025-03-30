@@ -3,11 +3,11 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null, // Currently logged-in user
-    fullName: "", // ✅ Added fullName
+    user: null, 
+    fullName: "", 
     email: "",
     password: "",
-    registeredUsers: [], // Store signed-up users
+    registeredUsers: [], 
   },
   reducers: {
     setFullName: (state, action) => {
@@ -23,9 +23,9 @@ const authSlice = createSlice({
       state.user = action.payload;
     },
     registerUser: (state, action) => {
-      state.registeredUsers.push(action.payload); // Add new user to list
+      state.registeredUsers.push(action.payload);
     },
-    logout: (state) => {
+    logoutUser: (state) => {
       state.user = null;
       state.fullName = "";
       state.email = "";
@@ -34,7 +34,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setFullName, setEmail, setPassword, setUser, registerUser, logout } = authSlice.actions;
+export const { setFullName, setEmail, setPassword, setUser, registerUser, logoutUser } = authSlice.actions;
 
 const store = configureStore({
   reducer: {
