@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
-import { setEmail, setPassword, setUser } from "../redux/store.js"; // Redux actions
+import { setUser } from "../redux/store.js"; // Redux actions
 
 export default function Login() {
   const [email, setEmailState] = useState("");
@@ -15,12 +15,12 @@ export default function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     if (!email || !password) {
       setError("Please fill in both fields.");
       return;
     }
-  
+
     try {
       const response = await fetch(
         `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
@@ -29,29 +29,36 @@ export default function Login() {
           headers: { "Content-Type": "application/json" },
         }
       );
-      const data = await response.json();
-      console.log("API Response:", data);
 
       if (!response.ok) {
         throw new Error("Invalid email or password.");
       }
-  
+
+      const data = await response.json();
+      console.log("API Response:", data);
+
       if (!data.userID) {
         throw new Error("Login failed. Please try again.");
       }
-  
-      const user = {
+
+      // Store user data in Redux
+      dispatch(
+        setUser({
+          userID: data.userID,
+          fullName: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          profilePic: data.profilePic || "https://placehold.co/150", // Better placeholder
+        })
+      );
+
+      console.log("Redux state updated with user:", {
         userID: data.userID,
         fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
-        profilePic: data.profilePic || "https://via.placeholder.com/150",
-      };
-  
-      dispatch(setUser(user)); 
-      dispatch(setEmail(""));
-      dispatch(setPassword(""));
-  
-      router.push("/profile"); 
+      });
+
+      // Redirect to profile page
+      router.push("/profile");
     } catch (err) {
       console.error("Login Error:", err.message);
       setError(err.message);

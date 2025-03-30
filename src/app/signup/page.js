@@ -33,33 +33,30 @@ export default function Signup() {
       return;
     }
 
+    // Split full name into first and last name
     const nameParts = fullName.trim().split(" ");
-    const user = {
-      firstName: nameParts[0],
-      lastName: nameParts.slice(1).join(" ") || "Unknown",
-      email,
-      password,
-    };
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "Unknown";
+
+    const user = { firstName, lastName, email, password };
 
     try {
       const response = await fetch(
         `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/register`,
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(user),
         }
       );
-    
+
       const responseText = await response.text();
       console.log("API Raw Response:", responseText);
-    
+
       if (!response.ok) {
         throw new Error(`Signup failed: ${responseText || "Unknown error"}`);
       }
-    
+
       let data;
       try {
         data = JSON.parse(responseText);
@@ -67,23 +64,22 @@ export default function Signup() {
         console.error("JSON Parse Error:", err);
         throw new Error("Invalid response format from server.");
       }
-    
+
       console.log("API Response:", data);
-    
+
       if (!data.userID) {
         throw new Error("Signup succeeded, but no user ID was returned.");
       }
-    
-      const newUser = {
+
+      // Store user in Redux
+      dispatch(setUser({
         userID: data.userID,
         fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
         profilePic: data.profilePic || "https://via.placeholder.com/150",
-      };
-    
-      dispatch(setUser(newUser));
-    
-      router.push("/profile"); // 🚀 Redirects to profile after signup
+      }));
+
+      router.push("/profile");
     } catch (err) {
       console.error("Signup Error:", err.message);
       setError(err.message);

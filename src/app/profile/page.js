@@ -28,6 +28,7 @@ export default function Profile() {
           const response = await fetch(
             `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/${user.userID}`
           );
+
           if (!response.ok) {
             throw new Error(`Failed to fetch user data. Status: ${response.status}`);
           }
@@ -51,6 +52,11 @@ export default function Profile() {
     router.push("/"); // Redirect to home page
   };
 
+  // Navigate to Home Page
+  const goToHome = () => {
+    router.push("/"); // Keeps user logged in and goes to home
+  };
+
   return (
     <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-sm">
@@ -61,7 +67,7 @@ export default function Profile() {
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
           <img
-            src={(profileData && profileData.profilePic) ? profileData.profilePic : defaultProfilePic}
+            src={profileData?.profilePic || defaultProfilePic}
             alt="Profile"
             className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
           />
@@ -69,21 +75,29 @@ export default function Profile() {
           {profileData ? (
             <>
               <h2 className="text-lg font-bold">
-                {`${profileData.firstName} ${profileData.lastName}`}
+                {`${profileData.firstName || "Guest"} ${profileData.lastName || ""}`}
               </h2>
-              <p className="text-gray-500">{profileData.email}</p>
+              <p className="text-gray-500">{profileData.email || "No email available"}</p>
             </>
           ) : (
             <p>Loading profile...</p>
           )}
 
-          {/* Logout Button */}
-          <button
-            onClick={handleLogout}
-            className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={goToHome}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            >
+              Go to Home
+            </button>
+            <button
+              onClick={handleLogout}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </main>
     </div>
