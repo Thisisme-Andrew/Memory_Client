@@ -1,26 +1,60 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/store.js";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
-  const router = useRouter();
   const dispatch = useDispatch();
-  const [isLoggingOut, setIsLoggingOut] = useState(false); // Track logout state
+  const router = useRouter();
+  const [profileData, setProfileData] = useState(null);
+  const [error, setError] = useState(null);
+  const defaultProfilePic = "https://picsum.photos/200";
 
+  // Redirect to login if user is not logged in
   useEffect(() => {
-    if (!user && !isLoggingOut) {
+    if (!user?.userID) {
       router.push("/login");
     }
-  }, [user, isLoggingOut, router]);
+  }, [user, router]);
 
+  // Fetch user profile data when userID is available
+  useEffect(() => {
+    if (user?.userID) {
+      const fetchUserProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/${user.userID}`
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch user data. Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Fetched User Data:", data);
+          setProfileData(data);
+        } catch (err) {
+          console.error("Profile Fetch Error:", err);
+          setError("Failed to fetch user data.");
+        }
+      };
+
+      fetchUserProfile();
+    }
+  }, [user?.userID]);
+
+  // Logout Function
   const handleLogout = () => {
-    setIsLoggingOut(true); // Prevent immediate redirect to /login
-    dispatch(logout()); 
+    dispatch(logoutUser()); // Clear user from Redux state
     router.push("/"); // Redirect to home page
+  };
+
+  // Navigate to Home Page
+  const goToHome = () => {
+    router.push("/"); // Keeps user logged in and goes to home
   };
 
   return (
@@ -30,20 +64,40 @@ export default function Profile() {
         <h2 className="text-xl font-semibold">User Profile</h2>
 
         <div className="flex flex-col items-center gap-4 w-full">
-          <img 
-            src={user?.profilePic || "https://via.placeholder.com/150"} 
-            alt="Profile" 
+          {error && <p className="text-red-500 text-sm">{error}</p>}
+
+          <img
+            src={profileData?.profilePic || defaultProfilePic}
+            alt="Profile"
             className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
           />
-          <h2 className="text-lg font-bold">{user?.fullName || "Guest User"}</h2>
-          <p className="text-gray-500">{user?.email || "No email available"}</p>
 
-          <button 
-            onClick={handleLogout} 
-            className="bg-red-500 text-white rounded px-4 py-2 hover:bg-red-600 transition"
-          >
-            Logout
-          </button>
+          {profileData ? (
+            <>
+              <h2 className="text-lg font-bold">
+                {`${profileData.firstName || "Guest"} ${profileData.lastName || ""}`}
+              </h2>
+              <p className="text-gray-500">{profileData.email || "No email available"}</p>
+            </>
+          ) : (
+            <p>Loading profile...</p>
+          )}
+
+          {/* Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={goToHome}
+              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
+            >
+              Go to Home
+            </button>
+            <button
+              onClick={handleLogout}
+              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
+            >
+              Logout
+            </button>
+          </div>
         </div>
       </main>
     </div>

@@ -3,30 +3,21 @@ import { createSlice, configureStore } from "@reduxjs/toolkit";
 const authSlice = createSlice({
   name: "auth",
   initialState: {
-    user: null, // Currently logged-in user
-    fullName: "", // ✅ Added fullName
+    user: null,
+    userID: null, // ✅ Explicitly store userID in Redux
+    fullName: "",
     email: "",
     password: "",
-    registeredUsers: [], // Store signed-up users
+    registeredUsers: [],
   },
   reducers: {
-    setFullName: (state, action) => {
-      state.fullName = action.payload;
-    },
-    setEmail: (state, action) => {
-      state.email = action.payload;
-    },
-    setPassword: (state, action) => {
-      state.password = action.payload;
-    },
     setUser: (state, action) => {
       state.user = action.payload;
+      state.userID = action.payload.userID; // ✅ Store userID separately for easy access
     },
-    registerUser: (state, action) => {
-      state.registeredUsers.push(action.payload); // Add new user to list
-    },
-    logout: (state) => {
+    logoutUser: (state) => {
       state.user = null;
+      state.userID = null; // ✅ Clear userID on logout
       state.fullName = "";
       state.email = "";
       state.password = "";
@@ -34,7 +25,7 @@ const authSlice = createSlice({
   },
 });
 
-export const { setFullName, setEmail, setPassword, setUser, registerUser, logout } = authSlice.actions;
+export const { setUser, logoutUser } = authSlice.actions;
 
 const store = configureStore({
   reducer: {
