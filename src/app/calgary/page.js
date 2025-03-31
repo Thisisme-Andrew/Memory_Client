@@ -1,5 +1,25 @@
 "use client"; // Add this to indicate this is a Client Component
 
+import axios from 'axios';
+
+// Assuming you already have your userID from the login process
+const BASE_URL = 'https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users';
+
+// Function to retrieve your own user data by userID
+async function retrieveOwnUser(userID) {
+  try {
+    const response = await axios.get(`${BASE_URL}/${userID}`);
+    console.log('Your User Data:', response.data.body);
+    return response.data.body;
+  } catch (error) {
+    console.error('Error retrieving user data:', error.response?.data || error.message);
+  }
+}
+
+// Example of using the function (replace `userID` with the actual user ID after login)
+const userID = 1; // Replace this with your actual userID obtained after login
+retrieveOwnUser(userID);
+
 export default function CalgaryPage() {
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">

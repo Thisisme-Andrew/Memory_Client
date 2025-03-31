@@ -11,7 +11,14 @@ export default function Home() {
 
   useEffect(() => {
     // Initialize the map once the component is mounted
-    const map = L.map(mapContainerRef.current).setView([51.505, -0.09], 13); // Change the coordinates to where you want to center the map
+    const map = L.map(mapContainerRef.current, {
+      worldCopyJump: true, // Enable world wrapping
+      maxBoundsViscosity: 1.0, // Improve the behavior of the bounding box
+      center: [51.505, -0.09], // Center of the map
+      zoom: 13, // Initial zoom level
+      minZoom: 4, // Minimum zoom level (prevents zooming out too far)
+      maxZoom: 18, // Maximum zoom level (optional, to prevent zooming in too far)
+    });
 
     // Set up the Google Maps layer
     L.tileLayer(
@@ -20,6 +27,7 @@ export default function Home() {
         attribution:
           'Map data &copy; <a href="https://www.google.com/intl/en_us/help/terms_maps.html">Google</a>',
         subdomains: ["mt0", "mt1", "mt2", "mt3"], // Google Map subdomains
+        noWrap: false, // Allow tiles to wrap around
       }
     ).addTo(map);
 
@@ -31,7 +39,7 @@ export default function Home() {
       iconAnchor: [20, 20], // Anchor the icon at the center
     });
 
-    // Add the marker with the custom star icon
+    // Add the markers for various locations
     const calgaryMarker = L.marker([51.0447, -114.0719], { icon: starIcon }).addTo(map)
       .bindPopup("<b>Calgary</b><br>Click to visit Calgary page");
     
@@ -41,7 +49,7 @@ export default function Home() {
     const osakaMarker = L.marker([34.69, 135.5], { icon: starIcon }).addTo(map)
       .bindPopup("<b>Osaka</b><br>Click to visit Osaka page");
 
-    // Add click event on the marker to redirect to /calgary/page.js
+    // Add click event on the marker to redirect to specific pages
     calgaryMarker.on('click', () => {
       router.push('/calgary');
     });
@@ -66,12 +74,11 @@ export default function Home() {
 
       {/* "View My Galleries" Button in the top left */}
       <button
-  onClick={() => router.push('/gallery')} // Navigate to the gallery page
-  className="absolute top-4 left-4 bg-white text-blue-600 py-2 px-6 rounded-full hover:bg-gray-100 hover:text-blue-700 transition duration-300"
->
-  View My Galleries
-</button>
-
+        onClick={() => router.push('/gallery')} // Navigate to the gallery page
+        className="absolute top-4 left-4 bg-white text-blue-600 py-2 px-6 rounded-full hover:bg-gray-100 hover:text-blue-700 transition duration-300"
+      >
+        View My Galleries
+      </button>
 
       {/* Google Maps Container */}
       <div
