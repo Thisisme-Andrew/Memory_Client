@@ -1,32 +1,68 @@
 "use client"; // Add this to indicate this is a Client Component
 
-import axios from 'axios';
-
-// Assuming you already have your userID from the login process
-const BASE_URL = 'https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users';
-
-// Function to retrieve your own user data by userID
-async function retrieveOwnUser(userID) {
-  try {
-    const response = await axios.get(`${BASE_URL}/${userID}`);
-    console.log('Your User Data:', response.data.body);
-    return response.data.body;
-  } catch (error) {
-    console.error('Error retrieving user data:', error.response?.data || error.message);
-  }
-}
-
-// Example of using the function (replace `userID` with the actual user ID after login)
-const userID = 1; // Replace this with your actual userID obtained after login
-retrieveOwnUser(userID);
+import { useEffect, useState } from "react";
 
 export default function CalgaryPage() {
+  const [memories, setMemories] = useState([
+    {
+      memoryID: 22,
+      creatorID: 47,
+      longitude: "123.23000000000000",
+      latitude: "-1.20000000000000",
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    },
+    {
+      memoryID: 23,
+      creatorID: 47,
+      longitude: "123.23000000000000",
+      latitude: "-1.20000000000000",
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    },
+    {
+      memoryID: 24,
+      creatorID: 47,
+      longitude: "-114.0719", // Calgary's Longitude
+      latitude: "51.0447",   // Calgary's Latitude
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    }
+  ]);
+
+  // Function to check if latitude and longitude are similar
+  const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 0.1) => {
+    const latDiff = Math.abs(lat1 - lat2);
+    const lonDiff = Math.abs(lon1 - lon2);
+    return latDiff < threshold && lonDiff < threshold;
+  };
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       {/* Profile Picture */}
       <a href="/profile" className="absolute top-4 right-4">
         <img
-          src="https://via.placeholder.com/50" // Replace this with the actual URL of the profile picture
+          src="https://via.placeholder.com/50"
           alt="Profile"
           className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
@@ -40,7 +76,7 @@ export default function CalgaryPage() {
       {/* Go Back Button */}
       <div className="absolute top-16 left-4">
         <button
-          onClick={() => window.history.back()} // Go back to the previous page
+          onClick={() => window.history.back()}
           className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           Go Back
@@ -59,98 +95,42 @@ export default function CalgaryPage() {
         />
       </div>
 
-      {/* Gallery Title */}
-      {/*<h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</h2>*/}
-      <a href="/galleryview" className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 1</a>
+      {/* Memory Galleries */}
+      {memories.length > 0 &&
+        memories.map((memory) => {
+          // Extract coordinates for comparison
+          const lat = parseFloat(memory.latitude);
+          const lon = parseFloat(memory.longitude);
 
-      {/* Horizontal Image Gallery Section */}
-      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
-        <div className="flex space-x-4 min-w-max">
-          {/* Red boxes for initial view with smaller size */}
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
+          // Check if this memory should be displayed based on the coordinates of memory 24 (Calgary)
+          if (areCoordinatesSimilar(lat, lon, -1.20000000000000, 123.23000000000000)) {
+            return (
+              <div key={memory.memoryID} className="w-full mb-6">
+                <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">
+                  Memory ID: {memory.memoryID}
+                </h2>
+                <div className="w-full overflow-x-auto custom-scrollbar">
+                  <div className="flex space-x-4 min-w-max">
+                    {memory.imageURLs.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Memory ${memory.memoryID} - Image ${index}`}
+                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          }
 
-          {/* White boxes for scrolling further */}
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-        </div>
-      </div>
-
-      {/* Gallery Title */}
-      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 2</h2>
-
-      {/* Horizontal Image Gallery Section */}
-      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
-        <div className="flex space-x-4 min-w-max">
-          {/* Red boxes for initial view with smaller size */}
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-
-          {/* White boxes for scrolling further */}
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-        </div>
-      </div>
-
-      {/* Gallery Title */}
-      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 3</h2>
-
-      {/* Horizontal Image Gallery Section */}
-      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
-        <div className="flex space-x-4 min-w-max">
-          {/* Red boxes for initial view with smaller size */}
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-
-          {/* White boxes for scrolling further */}
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-        </div>
-      </div>
-
-      {/* Gallery Title */}
-      <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">Gallery 4</h2>
-
-      {/* Horizontal Image Gallery Section */}
-      <div className="w-full overflow-x-auto mb-6 custom-scrollbar">
-        <div className="flex space-x-4 min-w-max">
-          {/* Red boxes for initial view with smaller size */}
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-          <div className="w-48 h-48 bg-red-500 rounded-lg"></div>
-
-          {/* White boxes for scrolling further */}
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-          <div className="w-48 h-48 bg-white border-2 border-blue-600 rounded-lg"></div>
-        </div>
-      </div>
-
+          return null; // Don't display this memory if coordinates are not similar
+        })}
+      
       {/* New Gallery Button */}
       <a
-        href="#gallery-section" // Scroll to the gallery section
+        href="#gallery-section"
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
       >
         New Gallery

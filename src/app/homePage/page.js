@@ -1,97 +1,117 @@
-"use client";
+"use client"; // Add this to indicate this is a Client Component
 
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef } from "react";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css"; // Import Leaflet styles
 
-export default function Home() {
+export default function CalgaryPage() {
   const router = useRouter();
-  const mapContainerRef = useRef(null); // Ref for the map container
+  const [memories, setMemories] = useState([
+    {
+      memoryID: 22,
+      creatorID: 47,
+      longitude: "123.23000000000000",
+      latitude: "-1.20000000000000",
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    },
+    {
+      memoryID: 23,
+      creatorID: 47,
+      longitude: "120.50000000000000",  // Moved marker to a different longitude
+      latitude: "-2.50000000000000",  // Adjusted latitude slightly
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    },
+    // Adding Calgary as a memory
+    {
+      memoryID: 24,
+      creatorID: 47,
+      longitude: "-114.0719", // Calgary Longitude
+      latitude: "51.0447",   // Calgary Latitude
+      collaborators: [1, 49],
+      imageURLs: [
+        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
+        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
+      ]
+    }
+  ]);
+
+  const mapContainerRef = useRef(null);
+  const [map, setMap] = useState(null);
 
   useEffect(() => {
-    // Initialize the map once the component is mounted
-    const map = L.map(mapContainerRef.current, {
-      worldCopyJump: true, // Enable world wrapping
-      maxBoundsViscosity: 1.0, // Improve the behavior of the bounding box
-      center: [51.505, -0.09], // Center of the map
-      zoom: 13, // Initial zoom level
-      minZoom: 4, // Minimum zoom level (prevents zooming out too far)
-      maxZoom: 18, // Maximum zoom level (optional, to prevent zooming in too far)
+    const initializedMap = L.map(mapContainerRef.current, {
+      center: [51.0447, -114.0719],  // Centered on Calgary
+      zoom: 4,
+      minZoom: 3, // Minimum zoom level
+      maxZoom: 10, // Maximum zoom level
+      worldCopyJump: true
     });
 
-    // Set up the Google Maps layer
-    L.tileLayer(
-      "https://{s}.google.com/vt/lyrs=m&x={x}&y={y}&z={z}",
-      {
-        attribution:
-          'Map data &copy; <a href="https://www.google.com/intl/en_us/help/terms_maps.html">Google</a>',
-        subdomains: ["mt0", "mt1", "mt2", "mt3"], // Google Map subdomains
-        noWrap: false, // Allow tiles to wrap around
-      }
-    ).addTo(map);
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: '&copy; OpenStreetMap contributors'
+    }).addTo(initializedMap);
 
-    // Add a marker on the map (optional)
-    const starIcon = L.divIcon({
-      className: 'leaflet-star-icon', // Assign a custom class name
-      html: '<div style="font-size: 32px; color: gold; transform: rotate(0deg);">&#9733;</div>', // HTML for a star
-      iconSize: [40, 40], // Icon size
-      iconAnchor: [20, 20], // Anchor the icon at the center
-    });
+    setMap(initializedMap); // Set the map state to persist across renders
 
-    // Add the markers for various locations
-    const calgaryMarker = L.marker([51.0447, -114.0719], { icon: starIcon }).addTo(map)
-      .bindPopup("<b>Calgary</b><br>Click to visit Calgary page");
-    
-    const londonMarker = L.marker([51.5, -0.09], { icon: starIcon }).addTo(map)
-      .bindPopup("<b>London</b><br>Click to visit London page");
-
-    const osakaMarker = L.marker([34.69, 135.5], { icon: starIcon }).addTo(map)
-      .bindPopup("<b>Osaka</b><br>Click to visit Osaka page");
-
-    // Add click event on the marker to redirect to specific pages
-    calgaryMarker.on('click', () => {
-      router.push('/calgary');
-    });
-
-    londonMarker.on('click', () => {
-      router.push('/london');
-    });
-
-    osakaMarker.on('click', () => {
-      router.push('/osaka');
-    });
-
-    // Cleanup the map instance on unmount
+    // Cleanup the map when the component is unmounted
     return () => {
-      map.remove();
+      initializedMap.remove();
     };
   }, []);
 
+  useEffect(() => {
+    if (map) {
+      const starIcon = L.divIcon({
+        className: 'leaflet-star-icon',
+        html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
+        iconSize: [40, 40],
+        iconAnchor: [20, 20]
+      });
+
+      // Loop through the memories and create their markers
+      memories.forEach(memory => {
+        const marker = L.marker([parseFloat(memory.latitude), parseFloat(memory.longitude)], { icon: starIcon })
+          .bindPopup(`<b>Memory ID: ${memory.memoryID}</b><br>Click to view`)
+          .on('click', () => {
+            router.push('/calgary'); // Redirects to the Calgary page
+          });
+
+        marker.addTo(map); // Add the memory markers to the map
+      });
+    }
+  }, [memories, map, router]);
+
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 p-8">
-      <h1 className="text-4xl font-bold text-white mb-6 drop-shadow-lg">Welcome to The Memory</h1>
-
-      {/* "View My Galleries" Button in the top left */}
-      <button
-        onClick={() => router.push('/gallery')} // Navigate to the gallery page
-        className="absolute top-4 left-4 bg-white text-blue-600 py-2 px-6 rounded-full hover:bg-gray-100 hover:text-blue-700 transition duration-300"
-      >
-        View My Galleries
-      </button>
-
-      {/* Google Maps Container */}
-      <div
-        id="map"
-        ref={mapContainerRef}
-        className="w-full max-w-3xl mt-8 rounded-lg shadow-lg"
-        style={{ height: "400px" }}
-      ></div>
-
-      {/* Footer */}
-      <footer className="absolute bottom-4 left-4 text-sm text-white opacity-80">
-        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
-      </footer>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+      <a href="/profile" className="absolute top-4 right-4">
+        <img
+          src="https://via.placeholder.com/50"
+          alt="Profile"
+          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
+        />
+      </a>
+      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
+        The Memory
+      </div>
+      <div className="absolute top-16 left-4">
+        <button
+          onClick={() => window.history.back()}
+          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+        >
+          Go Back
+        </button>
+      </div>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Memory</h1>
+      <div ref={mapContainerRef} className="w-full max-w-3xl h-96 rounded-lg shadow-lg mb-6"></div>
     </div>
   );
 }
