@@ -91,3 +91,12 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
         * To get the URLS, use the function in services/images/imagesServices.js
   - Output:
     - in the data there is an object with the memory's info with the memoryID
+
+2. getMemoriesByUser
+  - endpoint: '/getAllByUser'
+  - type: get
+  - Input and types: 
+    - An object with:
+      - creatorID: int (creator's userID)
+  - Output:
+    - in the data there is an object with all memories created by that user.
