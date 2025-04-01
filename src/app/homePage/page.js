@@ -1,91 +1,68 @@
-"use client"; // Add this to indicate this is a Client Component
+"use client";
 
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import L from "leaflet";
-import "leaflet/dist/leaflet.css"; // Import Leaflet styles
+import "leaflet/dist/leaflet.css";
 
 export default function CalgaryPage() {
   const router = useRouter();
-  const [memories, setMemories] = useState([
-    {
-      memoryID: 22,
-      creatorID: 47,
-      longitude: "123.23000000000000",
-      latitude: "-1.20000000000000",
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    },
-    {
-      memoryID: 23,
-      creatorID: 47,
-      longitude: "120.50000000000000",  // Moved marker to a different longitude
-      latitude: "-2.50000000000000",  // Adjusted latitude slightly
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    },
-    // Adding Calgary as a memory
-    {
-      memoryID: 24,
-      creatorID: 47,
-      longitude: "-114.0719", // Calgary Longitude
-      latitude: "51.0447",   // Calgary Latitude
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    }
-  ]);
-
+  const [memories, setMemories] = useState([]);
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
 
   useEffect(() => {
+    const fetchMemories = async () => {
+      try {
+        const response = await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllByUser?creatorID=47"
+        );
+        const data = await response.json();
+        setMemories(data);
+      } catch (err) {
+        console.error("Error fetching memories:", err);
+      }
+    };
+
+    fetchMemories();
+  }, []);
+
+  useEffect(() => {
     const initializedMap = L.map(mapContainerRef.current, {
-      center: [51.0447, -114.0719],  // Centered on Calgary
+      center: [51.0447, -114.0719],
       zoom: 4,
-      minZoom: 3, // Minimum zoom level
-      maxZoom: 10, // Maximum zoom level
-      worldCopyJump: true
+      minZoom: 3,
+      maxZoom: 10,
+      worldCopyJump: true,
     });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: '&copy; OpenStreetMap contributors'
+      attribution: "&copy; OpenStreetMap contributors",
     }).addTo(initializedMap);
 
-    setMap(initializedMap); // Set the map state to persist across renders
+    setMap(initializedMap);
 
-    // Cleanup the map when the component is unmounted
     return () => {
       initializedMap.remove();
     };
   }, []);
 
   useEffect(() => {
-    if (map) {
+    if (map && memories.length) {
       const starIcon = L.divIcon({
-        className: 'leaflet-star-icon',
+        className: "leaflet-star-icon",
         html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
         iconSize: [40, 40],
-        iconAnchor: [20, 20]
+        iconAnchor: [20, 20],
       });
 
-      // Loop through the memories and create their markers
-      memories.forEach(memory => {
-        const marker = L.marker([parseFloat(memory.latitude), parseFloat(memory.longitude)], { icon: starIcon })
-          .bindPopup(`<b>Memory ID: ${memory.memoryID}</b><br>Click to view`)
-          .on('click', () => {
-            router.push('/calgary'); // Redirects to the Calgary page
-          });
+      memories.forEach((memory) => {
+        const { memoryID, latitude, longitude } = memory;
+        const marker = L.marker([parseFloat(latitude), parseFloat(longitude)], { icon: starIcon })
+          .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
+          .on("click", () => router.push("/calgary"));
 
-        marker.addTo(map); // Add the memory markers to the map
+        marker.addTo(map);
       });
     }
   }, [memories, map, router]);
@@ -99,9 +76,7 @@ export default function CalgaryPage() {
           className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
       </a>
-      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
-        The Memory
-      </div>
+      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">The Memory</div>
       <div className="absolute top-16 left-4">
         <button
           onClick={() => window.history.back()}

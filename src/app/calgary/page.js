@@ -3,52 +3,22 @@
 import { useEffect, useState } from "react";
 
 export default function CalgaryPage() {
-  const [memories, setMemories] = useState([
-    {
-      memoryID: 22,
-      creatorID: 47,
-      longitude: "123.23000000000000",
-      latitude: "-1.20000000000000",
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    },
-    {
-      memoryID: 23,
-      creatorID: 47,
-      longitude: "123.23000000000000",
-      latitude: "-1.20000000000000",
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    },
-    {
-      memoryID: 24,
-      creatorID: 47,
-      longitude: "-114.0719", // Calgary's Longitude
-      latitude: "51.0447",   // Calgary's Latitude
-      collaborators: [1, 49],
-      imageURLs: [
-        "https://seng513memory.blob.core.windows.net/images/1743429713485-4ywc19.jpg",
-        "https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg"
-      ]
-    }
-  ]);
+  const [memories, setMemories] = useState([]);
+
+  useEffect(() => {
+    // Fetch memories from the database
+    const fetchMemories = async () => {
+      try {
+        const response = await fetch("https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllByUser?creatorID=47");
+        const data = await response.json();
+        setMemories(data);
+      } catch (error) {
+        console.error("Error fetching memories:", error);
+      }
+    };
+
+    fetchMemories();
+  }, []);
 
   // Function to check if latitude and longitude are similar
   const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 0.1) => {
@@ -102,8 +72,8 @@ export default function CalgaryPage() {
           const lat = parseFloat(memory.latitude);
           const lon = parseFloat(memory.longitude);
 
-          // Check if this memory should be displayed based on the coordinates of memory 24 (Calgary)
-          if (areCoordinatesSimilar(lat, lon, -1.20000000000000, 123.23000000000000)) {
+          // Check if this memory should be displayed based on Calgary's coordinates
+          if (areCoordinatesSimilar(lat, lon,  -1.20000000000000, 123.23000000000000)) {
             return (
               <div key={memory.memoryID} className="w-full mb-6">
                 <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">
