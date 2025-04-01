@@ -100,3 +100,13 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
       - creatorID: int (creator's userID)
   - Output:
     - in the data there is an object with all memories created by that user.
+
+3. retreiveAllMemoriesAssociatedByUserID
+  - endpoint: '/getAllWithCollaboratedByUser'
+  - type: get
+  - Input and types: 
+    - An object with:
+      - userID: int
+  - Output:
+    - in the data there is an object with all memories created by user and memories the user is a collaborator in
+    - the output will be in the data as {createdMemories, collaboratedMemories}, with list of all respective memories in each object
