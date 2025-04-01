@@ -1,8 +1,13 @@
 "use client"; // Add this to indicate this is a Client Component
 
 import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 
 export default function CalgaryPage() {
+  const searchParams = useSearchParams();
+  const latM = parseFloat(searchParams.get("lat"));
+  const lonM = parseFloat(searchParams.get("lon"));
   const [memories, setMemories] = useState([]);
 
   useEffect(() => {
@@ -19,9 +24,9 @@ export default function CalgaryPage() {
 
     fetchMemories();
   }, []);
-
+console.log('lat:', latM, 'lon:', lonM);
   // Function to check if latitude and longitude are similar
-  const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 0.1) => {
+  const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 2) => {
     const latDiff = Math.abs(lat1 - lat2);
     const lonDiff = Math.abs(lon1 - lon2);
     return latDiff < threshold && lonDiff < threshold;
@@ -73,7 +78,7 @@ export default function CalgaryPage() {
           const lon = parseFloat(memory.longitude);
 
           // Check if this memory should be displayed based on Calgary's coordinates
-          if (areCoordinatesSimilar(lat, lon,  -1.20000000000000, 123.23000000000000)) {
+          if (areCoordinatesSimilar(lat, lon, latM, lonM)) {
             return (
               <div key={memory.memoryID} className="w-full mb-6">
                 <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">

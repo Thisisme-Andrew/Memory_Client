@@ -60,7 +60,7 @@ export default function CalgaryPage() {
         const { memoryID, latitude, longitude } = memory;
         const marker = L.marker([parseFloat(latitude), parseFloat(longitude)], { icon: starIcon })
           .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
-          .on("click", () => router.push("/calgary"));
+          .on("click", () => router.push(`/calgary?lat=${latitude}&lon=${longitude}`))
 
         marker.addTo(map);
       });
