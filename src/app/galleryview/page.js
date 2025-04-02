@@ -52,6 +52,9 @@ export default function galleryview() {
       {/* Page Header */}
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
 
+      {console.log("memory is", memories.length)}
+      
+
       {/* Main Image Section */}
       <div className="flex w-full max-w-4xl items-center space-x-8">
         {/* Left Sidebar (Buttons) */}
@@ -71,27 +74,40 @@ export default function galleryview() {
           </button>
         </div>
 
-        {/* Current Image in the center */}
-        <div className="w-2/3">
-          <div className="w-full h-96 bg-red-500 rounded-lg mb-6"></div>
-        </div>
-
-        {/* Thumbnail List on the Right */}
-        <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
-          {/* This will enable vertical scrolling for the thumbnails */}
-          <div className="space-y-4">
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-            <div className="w-24 h-24 bg-red-500 rounded-lg"></div>
-          </div>
-        </div>
+        {memories.length > 0 &&
+        memories.map((memory) => {
+          if (memory.memoryID == currentid){
+            return (
+              <div key={memory.memoryID}>
+                <div className="w-2/3">
+                  <div>
+                    {memory.imageURLs.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Memory ${memory.memoryID} - Image ${index}`}
+                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                      />
+                    ))}
+                  </div>
+                </div>
+                <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
+                  <div className="space-y-4">
+                    {memory.imageURLs.map((url, index) => (
+                      <img
+                        key={index}
+                        src={url}
+                        alt={`Memory ${memory.memoryID} - Image ${index}`}
+                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                      />
+                    ))}
+                  </div>
+                </div>
+              </div>
+            );
+          }
+          return null; // Don't display this memory if coordinates are not similar
+        })}
       </div>
 
       {/* Footer (Copyright info) */}
