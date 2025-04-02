@@ -1,6 +1,28 @@
 "use client"; // Add this to indicate this is a Client Component
 
+import { useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
+
 export default function galleryview() {
+  const searchParams = useSearchParams();
+  const currentid = parseInt(searchParams.get("memid"));
+  const [memories, setMemories] = useState([]);
+
+  useEffect(() => {
+    // Fetch memories from the database
+    const fetchMemories = async () => {
+      try {
+        const response = await fetch("https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllByUser?creatorID=47");
+        const data = await response.json();
+        setMemories(data);
+      } catch (error) {
+        console.error("Error fetching memories:", error);
+      }
+    };
+
+    fetchMemories();
+  }, []);
+
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       {/* Profile Picture */}
@@ -28,7 +50,7 @@ export default function galleryview() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery 1</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
 
       {/* Main Image Section */}
       <div className="flex w-full max-w-4xl items-center space-x-8">

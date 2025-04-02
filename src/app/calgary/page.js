@@ -81,9 +81,9 @@ console.log('lat:', latM, 'lon:', lonM);
           if (areCoordinatesSimilar(lat, lon, latM, lonM)) {
             return (
               <div key={memory.memoryID} className="w-full mb-6">
-                <h2 className="text-2xl font-semibold text-white mb-4 text-left w-full">
+                <a className="text-2xl font-semibold text-white mb-4 text-left w-full" href={`../galleryview?memid=${memory.memoryID}`}>
                   Memory ID: {memory.memoryID}
-                </h2>
+                </a>
                 <div className="w-full overflow-x-auto custom-scrollbar">
                   <div className="flex space-x-4 min-w-max">
                     {memory.imageURLs.map((url, index) => (
