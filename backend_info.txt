@@ -119,3 +119,11 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
       - mnemoryID: int
   - Output:
     - in the data there is an object with all memories created by user and memories the user is a collaborator in
+
+5. retrieveAllMemories
+  - endpoint: '/all'
+  - type: get
+  - Input and types: 
+    - none
+  - Output:
+    - in the data there is an object with all memories
