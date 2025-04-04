@@ -15,10 +15,17 @@ export default function CalgaryPage() {
     const fetchMemories = async () => {
       try {
         const response = await fetch(
-          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllByUser?creatorID=47"
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=47"
         );
         const data = await response.json();
-        setMemories(data);
+
+        // Merging both createdMemories and collaboratedMemories
+        const allMemories = [
+          ...(data.createdMemories || []),
+          ...(data.collaboratedMemories || []),
+        ];
+
+        setMemories(allMemories);
       } catch (err) {
         console.error("Error fetching memories:", err);
       }
@@ -58,11 +65,13 @@ export default function CalgaryPage() {
 
       memories.forEach((memory) => {
         const { memoryID, latitude, longitude } = memory;
-        const marker = L.marker([parseFloat(latitude), parseFloat(longitude)], { icon: starIcon })
-          .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
-          .on("click", () => router.push(`/calgary?lat=${latitude}&lon=${longitude}`))
+        if (latitude && longitude) {
+          const marker = L.marker([parseFloat(latitude), parseFloat(longitude)], { icon: starIcon })
+            .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
+            .on("click", () => router.push(`/calgary?lat=${latitude}&lon=${longitude}`));
 
-        marker.addTo(map);
+          marker.addTo(map);
+        }
       });
     }
   }, [memories, map, router]);
