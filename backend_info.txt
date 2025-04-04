@@ -84,6 +84,8 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
   - Input and types: 
     - An object with:
       - creatorID: int (creator's userID)
+      - name: string (up to 100 characters)
+      - isPrivate: boolean
       - longitude: int
       - latitude: int
       - collaborators: array of userIDs
