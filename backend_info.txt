@@ -129,3 +129,60 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
     - none
   - Output:
     - in the data there is an object with all memories
+
+6. editMemoryLongitudeLatitude
+  - endpoint: '/editLongitudeLatitude'
+  - type: post
+  - Input and types: 
+    * Note you need to pass something into longitude and latitude, you cant just change one
+    - An object with:
+      - memoryID: int 
+      - longitude: double
+      - latitude: double
+  - Output:
+    - in the data there is an object with some general information
+
+7. addCollaborators
+  - endpoint: '/addCollaborators'
+  - type: post
+  - Input and types: 
+    * Note if you pass 2 of the same userID in the array, the data will break
+    - An object with:
+      - memoryID: int 
+      - collaborators: array of ints (userIDs)
+  - Output:
+    - in the data there is an object with some general information
+
+8. addImages
+  - endpoint: '/addImages'
+  - type: post
+  - Input and types: 
+    * Note if you pass 2 of the same url in the array, the data will break
+    - An object with:
+      - memoryID: int 
+      - imageURLs: array of strings (urls)
+        - this must be the exact url in the database, ex: https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg
+  - Output:
+    - in the data there is an object with some general information
+
+9. removeCollaborators
+  - endpoint: '/removeCollaborators'
+  - type: delete
+  - Input and types: 
+    * pass through body when making api call
+    - An object with:
+      - memoryID: int 
+      - collaborators: array of ints (userIDs)
+  - Output:
+    - in the data there is an object with some general information
+
+10. retrieveAllMemories
+  - endpoint: '/all'
+  - type: delete
+  - Input and types: 
+    - An object with:
+      - memoryID: int 
+      - imageURLs: array of strings (urls)
+        - this must be the exact url in the database, ex: https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg
+  - Output:
+    - in the data there is an object with some general information
