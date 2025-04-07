@@ -99,38 +99,36 @@ export default function MemoryPage() {
   // Render memory section
   const renderMemories = (memories, title) => (
     memories.length > 0 && (
-      <div className="w-full max-w-7xl mb-10 px-4">
+      <div className="w-full max-w-2xl mb-10">
         <h2 className="text-2xl font-semibold mb-4">{title}</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-          {memories.map((memory) => (
-            <div key={memory.memoryID} className="w-full">
-              <a
-                className="text-2xl font-semibold text-white mb-4 text-left w-full block"
-                href={`../galleryview?memid=${memory.memoryID}`}
-              >
-                Memory ID: {memory.memoryID}
-              </a>
-              <div className="w-full overflow-x-auto custom-scrollbar">
-                <div className="flex space-x-4 min-w-max">
-                  {memory.imageURLs.map((url, index) => (
-                    <img
-                      key={index}
-                      src={url}
-                      alt={`Memory ${memory.memoryID} - Image ${index}`}
-                      className="w-full sm:w-48 md:w-64 h-auto rounded-lg shadow-lg border-2 border-white"
-                    />
-                  ))}
-                </div>
+        {memories.map((memory) => (
+          <div key={memory.memoryID} className="w-full mb-6">
+            <a
+              className="text-2xl font-semibold text-white mb-4 text-left w-full"
+              href={`../galleryview?memid=${memory.memoryID}`}
+            >
+              Memory ID: {memory.memoryID}
+            </a>
+            <div className="w-full overflow-x-auto custom-scrollbar">
+              <div className="flex space-x-4 min-w-max">
+                {memory.imageURLs.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Memory ${memory.memoryID} - Image ${index}`}
+                    className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                  />
+                ))}
               </div>
             </div>
-          ))}
-        </div>
+          </div>
+        ))}
       </div>
     )
   );
 
   return (
-    <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       {/* Profile Picture */}
       <a href="/profile" className="absolute top-4 right-4">
         <img
@@ -156,7 +154,9 @@ export default function MemoryPage() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg w-full text-center">Memories Around You</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">
+        Memories Around You
+      </h1>
 
       {/* Search Box */}
       <div className="bg-white text-blue-600 shadow-lg rounded-lg p-4 w-full max-w-lg text-center mb-6">
