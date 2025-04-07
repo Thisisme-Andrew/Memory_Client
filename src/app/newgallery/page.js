@@ -1,0 +1,212 @@
+"use client";
+
+import { useState } from "react";
+
+export default function NewGalleryPage() {
+  const [name, setName] = useState("");
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [latitude, setLatitude] = useState("");
+  const [longitude, setLongitude] = useState("");
+  const [collaborators, setCollaborators] = useState([]);
+  const [imageFiles, setImageFiles] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [message, setMessage] = useState("");
+
+  const handleImageChange = (e) => {
+    setImageFiles([...e.target.files]);
+  };
+
+  const handleCollaboratorChange = (e) => {
+    const userId = parseInt(e.target.value);
+    if (!collaborators.includes(userId)) {
+      setCollaborators([...collaborators, userId]);
+    }
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    // Step 1: Upload images to get URLs
+    const imageUrls = await uploadImages(imageFiles);
+
+    // Step 2: Create memory data
+    const memoryData = {
+      creatorID: 47, // Replace with the current user ID
+      name,
+      isPrivate,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      collaborators,
+      imageURLs: imageUrls,
+    };
+
+    // Step 3: Make API request to create memory
+    try {
+      const response = await fetch(
+        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/add",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(memoryData),
+        }
+      );
+
+      const data = await response.json();
+      console.log("API Response:", data);
+      console.log(data.memoryID);
+
+      if (data.memoryID) {
+        setMessage("Memory created successfully!");
+      } else {
+        setMessage("Error creating memory. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error creating memory:", error);
+      setMessage("Error creating memory. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Function to upload images and return their URLs
+  const uploadImages = async (files) => {
+    const urls = [];
+    for (const file of files) {
+      // Implement the image upload logic here, 
+      // returning a URL for each uploaded image.
+      const imageUrl = await uploadImageToServer(file);
+      urls.push(imageUrl);
+    }
+    return urls;
+  };
+
+  // Mock image upload function (replace with your actual upload logic)
+  const uploadImageToServer = async (file) => {
+    // Simulate image upload and return a URL
+    const imageUrl = `https://yourimageuploadurl.com/${file.name}`;
+    return imageUrl;
+  };
+
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+      <h1 className="text-4xl font-semibold mb-6">Create New Memory</h1>
+
+      {loading && (
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white text-blue-600 shadow-lg rounded-lg p-6">
+        {/* Memory Name */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2" htmlFor="name">
+            Memory Name
+          </label>
+          <input
+            type="text"
+            id="name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            placeholder="Enter memory name"
+            required
+          />
+        </div>
+
+        {/* Privacy Option */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2">Privacy</label>
+          <label className="inline-flex items-center mr-6">
+            <input
+              type="radio"
+              value={false}
+              checked={!isPrivate}
+              onChange={() => setIsPrivate(false)}
+              className="form-radio text-blue-600"
+            />
+            <span className="ml-2">Public</span>
+          </label>
+          <label className="inline-flex items-center">
+            <input
+              type="radio"
+              value={true}
+              checked={isPrivate}
+              onChange={() => setIsPrivate(true)}
+              className="form-radio text-blue-600"
+            />
+            <span className="ml-2">Private</span>
+          </label>
+        </div>
+
+        {/* Coordinates */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2">Location</label>
+          <div className="flex space-x-4">
+            <input
+              type="number"
+              placeholder="Latitude"
+              value={latitude}
+              onChange={(e) => setLatitude(e.target.value)}
+              className="w-1/2 p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+            <input
+              type="number"
+              placeholder="Longitude"
+              value={longitude}
+              onChange={(e) => setLongitude(e.target.value)}
+              className="w-1/2 p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+        </div>
+
+        {/* Collaborators */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2">Collaborators (User IDs)</label>
+          <input
+            type="number"
+            placeholder="Enter collaborator user ID"
+            onChange={handleCollaboratorChange}
+            className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+          <p className="mt-2 text-sm text-gray-500">Enter collaborator user IDs. (Multiple IDs can be added.)</p>
+        </div>
+
+        {/* Image Upload */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2" htmlFor="images">
+            Upload Images
+          </label>
+          <input
+            type="file"
+            id="images"
+            multiple
+            accept="image/*"
+            onChange={handleImageChange}
+            className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
+
+        {/* Submit Button */}
+        <div className="mb-4">
+          <button
+            type="submit"
+            className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition"
+          >
+            Create Memory
+          </button>
+        </div>
+      </form>
+
+      {/* Status Message */}
+      {message && (
+        <p className="mt-4 text-lg font-semibold text-white">{message}</p>
+      )}
+    </div>
+  );
+}
