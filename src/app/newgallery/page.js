@@ -33,12 +33,12 @@ export default function NewGalleryPage() {
     // Step 2: Create memory data
     const memoryData = {
       creatorID: 47, // Replace with the current user ID
-      name,
-      isPrivate,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      collaborators,
-      imageURLs: imageUrls,
+      name: "something",
+      isPrivate: true,
+      latitude: parseFloat(1.232),
+      longitude: parseFloat(123),
+      collaborators: [],
+      imageURLs: [],
     };
 
     // Step 3: Make API request to create memory
