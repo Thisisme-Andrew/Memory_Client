@@ -33,12 +33,12 @@ export default function NewGalleryPage() {
     // Step 2: Create memory data
     const memoryData = {
       creatorID: 47, // Replace with the current user ID
-      name: "something",
-      isPrivate: true,
-      latitude: parseFloat(1.232),
-      longitude: parseFloat(123),
-      collaborators: [],
-      imageURLs: [],
+      name: name,
+      isPrivate: isPrivate,
+      latitude: parseFloat(latitude),
+      longitude: parseFloat(longitude),
+      collaborators: collaborators,
+      imageURLs: imageUrls,
     };
 
     // Step 3: Make API request to create memory
@@ -56,7 +56,7 @@ export default function NewGalleryPage() {
 
       const data = await response.json();
       console.log("API Response:", data);
-      console.log(data.memoryID);
+      console.log(isPrivate);
 
       if (data.memoryID) {
         setMessage("Memory created successfully!");
