@@ -122,6 +122,15 @@ export default function NewGalleryPage() {
   
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+      <div className="absolute top-16 left-4">
+        <button
+          onClick={() => window.history.back()}
+          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+        >
+          Go Back
+        </button>
+      </div>
+
       <h1 className="text-4xl font-semibold mb-6">Create New Memory</h1>
 
       {loading && (

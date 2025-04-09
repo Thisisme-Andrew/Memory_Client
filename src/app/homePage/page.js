@@ -96,6 +96,13 @@ export default function CalgaryPage() {
       </div>
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Memory</h1>
       <div ref={mapContainerRef} className="w-full max-w-3xl h-96 rounded-lg shadow-lg mb-6"></div>
+      {/* New Gallery Button */}
+      <a
+        href={`../newgallery`}
+        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
+      >
+        New Gallery
+      </a>
     </div>
   );
 }
