@@ -103,6 +103,13 @@ export default function CalgaryPage() {
       >
         New Gallery
       </a>
+      <div className="absolute top-16 right-4">
+      <a
+        href={`../allgalleries`}
+        className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
+        View All Galleries
+      </a>
+      </div>
     </div>
   );
 }
