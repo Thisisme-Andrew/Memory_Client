@@ -130,7 +130,7 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
   - Output:
     - in the data there is an object with all memories
 
-6. editMemoryLongitudeLatitude
+6. editLongitudeLatitude
   - endpoint: '/editLongitudeLatitude'
   - type: post
   - Input and types: 
@@ -176,13 +176,22 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
   - Output:
     - in the data there is an object with some general information
 
-10. retrieveAllMemories
-  - endpoint: '/all'
+10. removeImages
+  - endpoint: '/removeImages'
   - type: delete
   - Input and types: 
     - An object with:
       - memoryID: int 
       - imageURLs: array of strings (urls)
         - this must be the exact url in the database, ex: https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg
+  - Output:
+    - in the data there is an object with some general information
+
+11. retrieveAllMemories
+  - endpoint: '/removeMemory'
+  - type: delete
+  - Input and types: 
+    - An object with:
+      - memoryID: int 
   - Output:
     - in the data there is an object with some general information
