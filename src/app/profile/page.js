@@ -83,9 +83,6 @@ export default function Profile() {
           >
             Go to Home
           </button>
-    dispatch(logoutUser()); // Clear user from Redux state
-    router.push("/"); // Redirect to home page
-  };
         </div>
       </div>
     </div>
