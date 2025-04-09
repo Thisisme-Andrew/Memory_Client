@@ -1,22 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { registerUser, setEmail, setPassword, setFullName } from "../redux/store.js"; // Import Redux actions
+import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
+import { setUser } from "../redux/store.js"; 
 
 export default function Signup() {
-  const fullName = useSelector((state) => state.auth.fullName);
-  const email = useSelector((state) => state.auth.email);
-  const password = useSelector((state) => state.auth.password);
-  const registeredUsers = useSelector((state) => state.auth.registeredUsers); // Get all users
-  const dispatch = useDispatch();
-  const router = useRouter();
-
+  const [fullName, setFullName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!fullName || !email || !password || !confirmPassword) {
@@ -34,23 +33,57 @@ export default function Signup() {
       return;
     }
 
-    if (registeredUsers.some((user) => user.email === email)) {
-      setError("Email already registered.");
-      return;
+    // Split full name into first and last name
+    const nameParts = fullName.trim().split(" ");
+    const firstName = nameParts[0];
+    const lastName = nameParts.slice(1).join(" ") || "Unknown";
+
+    const user = { firstName, lastName, email, password };
+
+    try {
+      const response = await fetch(
+        `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/register`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(user),
+        }
+      );
+
+      const responseText = await response.text();
+      console.log("API Raw Response:", responseText);
+
+      if (!response.ok) {
+        throw new Error(`Signup failed: ${responseText || "Unknown error"}`);
+      }
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (err) {
+        console.error("JSON Parse Error:", err);
+        throw new Error("Invalid response format from server.");
+      }
+
+      console.log("API Response:", data);
+
+      if (!data.userID) {
+        throw new Error("Signup succeeded, but no user ID was returned.");
+      }
+
+      // Store user in Redux
+      dispatch(setUser({
+        userID: data.userID,
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        profilePic: data.profilePic || "https://via.placeholder.com/150",
+      }));
+
+      router.push("/profile");
+    } catch (err) {
+      console.error("Signup Error:", err.message);
+      setError(err.message);
     }
-
-    setError("");
-
-    const newUser = {
-      fullName,
-      email,
-      password, // Store the password for validation
-      profilePic: "https://fastly.picsum.photos/id/1060/200/200.jpg?hmac=M0E6SK-_reDe8rAPtwDpww5ihTgL6yewgERGc7eX5z8",
-    };
-
-    dispatch(registerUser(newUser)); // Save user in Redux
-
-    router.push("/login");
   };
 
   return (
@@ -63,21 +96,21 @@ export default function Signup() {
             type="text"
             placeholder="Full Name"
             value={fullName}
-            onChange={(e) => dispatch(setFullName(e.target.value))} // ✅ Fix here
+            onChange={(e) => setFullName(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => dispatch(setEmail(e.target.value))}
+            onChange={(e) => setEmail(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => dispatch(setPassword(e.target.value))}
+            onChange={(e) => setPassword(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input

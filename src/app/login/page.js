@@ -2,19 +2,18 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch, useSelector } from "react-redux";
-import { setEmail, setPassword, setUser } from "../redux/store.js"; // Import Redux actions
+import { useDispatch } from "react-redux";
+import { setUser } from "../redux/store.js"; // Redux actions
 
 export default function Login() {
-  const email = useSelector((state) => state.auth.email);
-  const password = useSelector((state) => state.auth.password);
-  const registeredUsers = useSelector((state) => state.auth.registeredUsers); // Get registered users from Redux
+  const [email, setEmailState] = useState("");
+  const [password, setPasswordState] = useState("");
+  const [error, setError] = useState("");
+
   const dispatch = useDispatch();
   const router = useRouter();
 
-  const [error, setError] = useState("");
-
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
     if (!email || !password) {
@@ -22,21 +21,47 @@ export default function Login() {
       return;
     }
 
-    // Check if the email exists in registeredUsers
-    const user = registeredUsers.find((user) => user.email === email);
+    try {
+      const response = await fetch(
+        `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/login?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`,
+        {
+          method: "GET",
+          headers: { "Content-Type": "application/json" },
+        }
+      );
 
-    if (!user) {
-      setError("Email not recognized.");
-    } else if (user.password !== password) {
-      setError("Incorrect password.");
-    } else {
-      setError("");
-      console.log("Login successful!", { email, password });
+      if (!response.ok) {
+        throw new Error("Invalid email or password.");
+      }
 
-      // Save logged-in user data in Redux
-      dispatch(setUser(user));
+      const data = await response.json();
+      console.log("API Response:", data);
 
+      if (!data.userID) {
+        throw new Error("Login failed. Please try again.");
+      }
+
+      // Store user data in Redux
+      dispatch(
+        setUser({
+          userID: data.userID,
+          fullName: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          profilePic: data.profilePic || "https://placehold.co/150", // Better placeholder
+        })
+      );
+
+      console.log("Redux state updated with user:", {
+        userID: data.userID,
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+      });
+
+      // Redirect to profile page
       router.push("/profile");
+    } catch (err) {
+      console.error("Login Error:", err.message);
+      setError(err.message);
     }
   };
 
@@ -50,14 +75,14 @@ export default function Login() {
             type="email"
             placeholder="Email"
             value={email}
-            onChange={(e) => dispatch(setEmail(e.target.value))}
+            onChange={(e) => setEmailState(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <input
             type="password"
             placeholder="Password"
             value={password}
-            onChange={(e) => dispatch(setPassword(e.target.value))}
+            onChange={(e) => setPasswordState(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
           <button
@@ -69,7 +94,10 @@ export default function Login() {
         </form>
         {error && <p className="text-red-500 text-sm">{error}</p>}
         <p className="text-sm text-gray-500">
-          Don't have an account? <a href="/signup" className="text-blue-500 hover:underline">Sign up</a>
+          Don't have an account?{" "}
+          <a href="/signup" className="text-blue-500 hover:underline">
+            Sign up
+          </a>
         </p>
       </main>
     </div>

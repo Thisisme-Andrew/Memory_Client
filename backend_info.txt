@@ -1,0 +1,188 @@
+BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
+
+-- USERS --
+- For all users you need baseURL + /api/users + endpoint specific extension
+
+1. createUser():
+  - endpoint: '/register'
+  - type: post
+  - Input and types: 
+    - An object with:
+      - firstName : string
+      - lastName : string
+      - email : string
+      - password : string
+  - Output:
+    - in the data there is an object with the user's info with the userID (no password is returned)
+
+2. loginUser
+  - endpoint: '/login'
+  - type: get
+  - Input and types
+    - An object with:
+      - email: string
+      - password: string
+  - Output:
+    - in the data there should be object with the user's information, otherwise there will be an error in data
+
+3. editUser
+  - endpoint: '/edit'
+  - type: put
+  - Input and types
+    - An object with: 
+      - firstName : string
+      - lastName : string
+      - email : string
+      - userID : number
+    - Output:
+      - in data, just some general information, probably nothing useful
+    
+4. removeUser
+  - endpoint: '/remove'
+  - type: delete
+  - Input and types:
+    - an object with:
+      userID = number
+  - Output:
+    - in data, just some general information, probably nothing useful
+
+5. retreiveUser
+  - endpoint: '/:id'
+  - type: get
+  - Input and types: 
+    - an object with:
+      userID = number
+  - Output: 
+    - in the data there is an object with the user's info with the userID (no password is returned)
+
+6. retreiveAllUsers
+  - endpoint: /
+  - type: get
+  - Input and types:
+    - none
+  - Output
+    - in data it should be an array of all the users currently without the passwords
+
+7. changePassword
+  - endpoint: '/reset-password'
+  - type: put
+  - Input and types: 
+    - an object with:
+      email: string
+      password: string
+  - Output:
+    - in data, just some general information, probably nothing useful
+
+
+
+-- MEMORIES --
+- For all memories you need baseURL + /api/memories + endpoint specific extension
+
+1. createMemory:
+  - endpoint: '/add'
+  - type: post
+  - Input and types: 
+    - An object with:
+      - creatorID: int (creator's userID)
+      - name: string (up to 100 characters)
+      - isPrivate: boolean
+      - longitude: int
+      - latitude: int
+      - collaborators: array of userIDs
+      - imageURLs: array of URLs
+        * To get the URLS, use the function in services/images/imagesServices.js
+  - Output:
+    - in the data there is an object with the memory's info with the memoryID
+
+2. getMemoriesByUser
+  - endpoint: '/getAllByUser'
+  - type: get
+  - Input and types: 
+    - An object with:
+      - creatorID: int (creator's userID)
+  - Output:
+    - in the data there is an object with all memories created by that user.
+
+3. retreiveAllMemoriesAssociatedByUserID
+  - endpoint: '/getAllWithCollaboratedByUser'
+  - type: get
+  - Input and types: 
+    - An object with:
+      - userID: int
+  - Output:
+    - in the data there is an object with all memories created by user and memories the user is a collaborator in
+    - the output will be in the data as {createdMemories, collaboratedMemories}, with list of all respective memories in each object
+
+4. retrieveMemoryByID
+  - endpoint: '/:id' (this means just pass the id)
+  - type: get
+  - Input and types: 
+    - An object with:
+      - mnemoryID: int
+  - Output:
+    - in the data there is an object with all memories created by user and memories the user is a collaborator in
+
+5. retrieveAllMemories
+  - endpoint: '/all'
+  - type: get
+  - Input and types: 
+    - none
+  - Output:
+    - in the data there is an object with all memories
+
+6. editMemoryLongitudeLatitude
+  - endpoint: '/editLongitudeLatitude'
+  - type: post
+  - Input and types: 
+    * Note you need to pass something into longitude and latitude, you cant just change one
+    - An object with:
+      - memoryID: int 
+      - longitude: double
+      - latitude: double
+  - Output:
+    - in the data there is an object with some general information
+
+7. addCollaborators
+  - endpoint: '/addCollaborators'
+  - type: post
+  - Input and types: 
+    * Note if you pass 2 of the same userID in the array, the data will break
+    - An object with:
+      - memoryID: int 
+      - collaborators: array of ints (userIDs)
+  - Output:
+    - in the data there is an object with some general information
+
+8. addImages
+  - endpoint: '/addImages'
+  - type: post
+  - Input and types: 
+    * Note if you pass 2 of the same url in the array, the data will break
+    - An object with:
+      - memoryID: int 
+      - imageURLs: array of strings (urls)
+        - this must be the exact url in the database, ex: https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg
+  - Output:
+    - in the data there is an object with some general information
+
+9. removeCollaborators
+  - endpoint: '/removeCollaborators'
+  - type: delete
+  - Input and types: 
+    * pass through body when making api call
+    - An object with:
+      - memoryID: int 
+      - collaborators: array of ints (userIDs)
+  - Output:
+    - in the data there is an object with some general information
+
+10. retrieveAllMemories
+  - endpoint: '/all'
+  - type: delete
+  - Input and types: 
+    - An object with:
+      - memoryID: int 
+      - imageURLs: array of strings (urls)
+        - this must be the exact url in the database, ex: https://seng513memory.blob.core.windows.net/images/1743402206714-D_h3eDiXYAE0daG.jpeg
+  - Output:
+    - in the data there is an object with some general information

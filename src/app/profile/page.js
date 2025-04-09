@@ -1,22 +1,53 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation"; // Import useRouter from next/navigation
 import { useSelector, useDispatch } from "react-redux";
-import { logout } from "../redux/store.js";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
-  const router = useRouter();
   const dispatch = useDispatch();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
+  const [profileData, setProfileData] = useState(null);
+  const [error, setError] = useState(null);
+  const defaultProfilePic = "https://picsum.photos/200";
 
+  // Redirect to login if user is not logged in
   useEffect(() => {
     if (!user && !isLoggingOut) {
       router.push("/login"); // If no user, redirect to login
     }
-  }, [user, isLoggingOut, router]);
+  }, [user, router]);
 
+  // Fetch user profile data when userID is available
+  useEffect(() => {
+    if (user?.userID) {
+      const fetchUserProfile = async () => {
+        try {
+          const response = await fetch(
+            `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/users/${user.userID}`
+          );
+
+          if (!response.ok) {
+            throw new Error(`Failed to fetch user data. Status: ${response.status}`);
+          }
+
+          const data = await response.json();
+          console.log("Fetched User Data:", data);
+          setProfileData(data);
+        } catch (err) {
+          console.error("Profile Fetch Error:", err);
+          setError("Failed to fetch user data.");
+        }
+      };
+
+      fetchUserProfile();
+    }
+  }, [user?.userID]);
+
+  // Logout Function
   const handleLogout = () => {
     setIsLoggingOut(true);
     dispatch(logout()); // Dispatch logout action
@@ -52,6 +83,9 @@ export default function Profile() {
           >
             Go to Home
           </button>
+    dispatch(logoutUser()); // Clear user from Redux state
+    router.push("/"); // Redirect to home page
+  };
         </div>
       </div>
     </div>

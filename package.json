@@ -9,8 +9,10 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@azure/storage-blob": "^12.27.0",
     "@reduxjs/toolkit": "^2.6.1",
     "axios": "^1.8.4",
+    "dotenv": "^16.4.7",
     "leaflet": "^1.9.4",
     "leaflet-google": "^1.0.1",
     "next": "^15.2.3",
