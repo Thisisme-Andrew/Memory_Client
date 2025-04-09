@@ -26,50 +26,66 @@ export default function NewGalleryPage() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
-
-    // Step 1: Upload images to get URLs
-    const imageUrls = await uploadImages(imageFiles);
-
-    // Step 2: Create memory data
-    const memoryData = {
-      creatorID: 47, // Replace with the current user ID
-      name: name,
-      isPrivate: isPrivate,
-      latitude: parseFloat(latitude),
-      longitude: parseFloat(longitude),
-      collaborators: collaborators,
-      imageURLs: imageUrls,
-    };
-
-    // Step 3: Make API request to create memory
+    setMessage("");
+  
     try {
-      const response = await fetch(
+      // Step 1: Upload images
+      const imageUrls = await uploadImages(imageFiles);
+  
+      // Step 2: Create memory
+      const memoryData = {
+        creatorID: 47, // Replace with actual user ID
+        name: name,
+        isPrivate: isPrivate,
+        latitude: parseFloat(latitude),
+        longitude: parseFloat(longitude),
+        collaborators: collaborators,
+        imageURLs: [], // Do NOT include imageURLs here
+      };
+  
+      const createResponse = await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/add",
         {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
+          headers: { "Content-Type": "application/json" },
           body: JSON.stringify(memoryData),
         }
       );
-
-      const data = await response.json();
-      console.log("API Response:", data);
-      console.log(isPrivate);
-
-      if (data.memoryID) {
-        setMessage("Memory created successfully!");
-      } else {
-        setMessage("Error creating memory. Please try again.");
+  
+      const createData = await createResponse.json();
+      console.log("Memory created:", createData);
+  
+      if (!createData.memoryID) {
+        throw new Error("Failed to create memory");
       }
+  
+      // Step 3: Call /addImages with memoryID and imageURLs
+      const uniqueImageUrls = [...new Set(imageUrls)]; // Remove duplicate URLs to avoid breaking the API
+  
+      const imageResponse = await fetch(
+        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/addImages",
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            memoryID: createData.memoryID,
+            imageURLs: uniqueImageUrls,
+          }),
+        }
+      );
+  
+      const imageData = await imageResponse.json();
+      console.log("Images added:", imageData);
+  
+      setMessage("Memory and images created successfully!");
     } catch (error) {
-      console.error("Error creating memory:", error);
-      setMessage("Error creating memory. Please try again.");
+      console.error("Error:", error);
+      setMessage("Error creating memory or uploading images. Please try again.");
     } finally {
       setLoading(false);
     }
   };
+  
 
   // Function to upload images and return their URLs
   const uploadImages = async (files) => {
@@ -85,11 +101,25 @@ export default function NewGalleryPage() {
 
   // Mock image upload function (replace with your actual upload logic)
   const uploadImageToServer = async (file) => {
-    // Simulate image upload and return a URL
-    const imageUrl = `https://yourimageuploadurl.com/${file.name}`;
-    return imageUrl;
+    const blobName = `${Date.now()}-${file.name}`;
+    const uploadUrl = `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}?${process.env.NEXT_PUBLIC_AZURE_SAS_TOKEN}`;
+  
+    const response = await fetch(uploadUrl, {
+      method: "PUT",
+      headers: {
+        "x-ms-blob-type": "BlockBlob",
+        "Content-Type": file.type,
+      },
+      body: file,
+    });
+  
+    if (!response.ok) {
+      throw new Error(`Failed to upload image: ${file.name}`);
+    }
+  
+    return `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}`;
   };
-
+  
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       <h1 className="text-4xl font-semibold mb-6">Create New Memory</h1>
