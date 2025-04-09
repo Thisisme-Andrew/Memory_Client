@@ -56,6 +56,13 @@ export default function Login() {
         fullName: `${data.firstName} ${data.lastName}`,
         email: data.email,
       });
+      
+      sessionStorage.setItem("user", JSON.stringify({
+        userID: data.userID,
+        fullName: `${data.firstName} ${data.lastName}`,
+        email: data.email,
+        profilePic: data.profilePic || "https://placehold.co/150", // Better placeholder
+      }));
 
       // Redirect to profile page
       router.push("/profile");

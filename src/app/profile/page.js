@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
@@ -16,10 +17,16 @@ export default function Profile() {
 
   // Redirect to login if user is not logged in
   useEffect(() => {
-    if (!user && !isLoggingOut) {
+    const storedUser = sessionStorage.getItem("user");
+    if (!storedUser && !isLoggingOut) {
       router.push("/login"); // If no user, redirect to login
+    } else {
+      const userData = JSON.parse(storedUser);
+      if (userData) {
+        dispatch(setUser(userData)); // Set the Redux state if user data is available
+      }
     }
-  }, [user, router]);
+  }, [router, isLoggingOut, dispatch]);
 
   // Fetch user profile data when userID is available
   useEffect(() => {
@@ -50,7 +57,8 @@ export default function Profile() {
   // Logout Function
   const handleLogout = () => {
     setIsLoggingOut(true);
-    dispatch(logout()); // Dispatch logout action
+    sessionStorage.removeItem("user");
+    dispatch(logoutUser()); // Dispatch logout action
     router.push("/"); // Redirect to home page after logout
   };
 

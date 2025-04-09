@@ -1,38 +1,59 @@
 "use client";
 
+import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
 export default function CalgaryPage() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const [memories, setMemories] = useState([]);
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
 
-  useEffect(() => {
-    const fetchMemories = async () => {
-      try {
-        const response = await fetch(
-          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=47"
-        );
-        const data = await response.json();
-
-        // Merging both createdMemories and collaboratedMemories
-        const allMemories = [
-          ...(data.createdMemories || []),
-          ...(data.collaboratedMemories || []),
-        ];
-
-        setMemories(allMemories);
-      } catch (err) {
-        console.error("Error fetching memories:", err);
+  // Redirect to login if user is not logged in
+    useEffect(() => {
+      const storedUser = sessionStorage.getItem("user");
+      if (!storedUser && !isLoggingOut) {
+        router.push("/login"); // If no user, redirect to login
+      } else {
+        const userData = JSON.parse(storedUser);
+        if (userData) {
+          dispatch(setUser(userData)); // Set the Redux state if user data is available
+        }
       }
-    };
+    }, [router, isLoggingOut, dispatch]);
 
-    fetchMemories();
-  }, []);
+  useEffect(() => {
+    if (user?.userID){
+      const fetchMemories = async () => {
+        try {
+          const response = await fetch(
+            `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=${user.userID}`
+          );
+          const data = await response.json();
+  
+          // Merging both createdMemories and collaboratedMemories
+          const allMemories = [
+            ...(data.createdMemories || []),
+            ...(data.collaboratedMemories || []),
+          ];
+  
+          setMemories(allMemories);
+        } catch (err) {
+          console.error("Error fetching memories:", err);
+        }
+      };
+  
+      fetchMemories();
+    }
+  }, [user?.userID]);
 
   useEffect(() => {
     const initializedMap = L.map(mapContainerRef.current, {
