@@ -17,11 +17,18 @@ export default function NewGalleryPage() {
   };
 
   const handleCollaboratorChange = (e) => {
-    const userId = parseInt(e.target.value);
-    if (!collaborators.includes(userId)) {
-      setCollaborators([...collaborators, userId]);
-    }
+    const userIds = e.target.value
+      .split(",") // Split input by commas
+      .map((id) => id.trim()) // Trim any extra spaces around the IDs
+      .map((id) => parseInt(id)) // Convert to numbers
+      .filter((id) => !isNaN(id)); // Filter out any non-number values
+  
+    setCollaborators((prevCollaborators) => {
+      const newCollaborators = [...new Set([...prevCollaborators, ...userIds])]; // Add new IDs and ensure uniqueness
+      return newCollaborators;
+    });
   };
+  
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -43,16 +50,20 @@ export default function NewGalleryPage() {
         imageURLs: [], // Do NOT include imageURLs here
       };
   
-      const createResponse = await fetch(
-        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/add",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(memoryData),
-        }
-      );
+      const createResponse = async () => {
+        console.log("collabaors object: " + collaborators);
+        return await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/add",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(memoryData),
+          }
+        );
+      }
   
-      const createData = await createResponse.json();
+      let createData = await createResponse();
+      createData = await createData.json();
       console.log("Memory created:", createData);
   
       if (!createData.memoryID) {
@@ -203,18 +214,18 @@ export default function NewGalleryPage() {
             />
           </div>
         </div>
+          {/* Collaborators */}
+          <div className="mb-4">
+            <label className="block text-lg font-semibold mb-2">Collaborators (User IDs)</label>
+            <input
+              type="text"
+              placeholder="Enter collaborator user IDs separated by commas"
+              onChange={handleCollaboratorChange}
+              className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+            <p className="mt-2 text-sm text-gray-500">Enter collaborator user IDs, separated by commas.</p>
+          </div>
 
-        {/* Collaborators */}
-        <div className="mb-4">
-          <label className="block text-lg font-semibold mb-2">Collaborators (User IDs)</label>
-          <input
-            type="number"
-            placeholder="Enter collaborator user ID"
-            onChange={handleCollaboratorChange}
-            className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="mt-2 text-sm text-gray-500">Enter collaborator user IDs. (Multiple IDs can be added.)</p>
-        </div>
 
         {/* Image Upload */}
         <div className="mb-4">
