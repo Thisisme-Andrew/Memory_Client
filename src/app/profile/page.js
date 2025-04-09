@@ -8,6 +8,7 @@ import { logoutUser } from "../redux/store.js"; // Import logout action
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
   const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState(null);
@@ -15,8 +16,8 @@ export default function Profile() {
 
   // Redirect to login if user is not logged in
   useEffect(() => {
-    if (!user?.userID) {
-      router.push("/login");
+    if (!user && !isLoggingOut) {
+      router.push("/login"); // If no user, redirect to login
     }
   }, [user, router]);
 
@@ -48,58 +49,45 @@ export default function Profile() {
 
   // Logout Function
   const handleLogout = () => {
-    dispatch(logoutUser()); // Clear user from Redux state
-    router.push("/"); // Redirect to home page
+    setIsLoggingOut(true);
+    dispatch(logout()); // Dispatch logout action
+    router.push("/"); // Redirect to home page after logout
   };
 
-  // Navigate to Home Page
-  const goToHome = () => {
-    router.push("/"); // Keeps user logged in and goes to home
+  const handleGoHome = () => {
+    router.push("/homePage"); // Directly navigate to the home page
   };
 
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start w-full max-w-sm">
-        <h1 className="text-4xl font-extrabold text-gray-900 dark:text-white">The Memory</h1>
-        <h2 className="text-xl font-semibold">User Profile</h2>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
+      <h1 className="text-3xl font-semibold text-gray-800 mb-4">User Profile</h1>
+      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
+        <img
+          src={user?.profilePic || "https://via.placeholder.com/150"}
+          alt="Profile"
+          className="w-32 h-32 rounded-full object-cover mb-4 mx-auto"
+        />
+        <h2 className="text-xl font-bold text-center mb-2">{user?.fullName || "Guest User"}</h2>
+        <p className="text-center text-gray-500 mb-4">{user?.email || "No email available"}</p>
 
-        <div className="flex flex-col items-center gap-4 w-full">
-          {error && <p className="text-red-500 text-sm">{error}</p>}
-
-          <img
-            src={profileData?.profilePic || defaultProfilePic}
-            alt="Profile"
-            className="w-24 h-24 rounded-full object-cover border-2 border-gray-300"
-          />
-
-          {profileData ? (
-            <>
-              <h2 className="text-lg font-bold">
-                {`${profileData.firstName || "Guest"} ${profileData.lastName || ""}`}
-              </h2>
-              <p className="text-gray-500">{profileData.email || "No email available"}</p>
-            </>
-          ) : (
-            <p>Loading profile...</p>
-          )}
-
-          {/* Buttons */}
-          <div className="flex gap-4">
-            <button
-              onClick={goToHome}
-              className="mt-4 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition"
-            >
-              Go to Home
-            </button>
-            <button
-              onClick={handleLogout}
-              className="mt-4 bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 transition"
-            >
-              Logout
-            </button>
-          </div>
+        <div className="flex justify-center gap-4">
+          <button
+            onClick={handleLogout}
+            className="bg-red-500 text-white py-2 px-6 rounded hover:bg-red-600 transition"
+          >
+            Logout
+          </button>
+          <button
+            onClick={handleGoHome} // This button navigates to the home page
+            className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
+          >
+            Go to Home
+          </button>
+    dispatch(logoutUser()); // Clear user from Redux state
+    router.push("/"); // Redirect to home page
+  };
         </div>
-      </main>
+      </div>
     </div>
   );
 }
