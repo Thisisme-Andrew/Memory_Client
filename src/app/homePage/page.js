@@ -84,12 +84,14 @@ export default function CalgaryPage() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
       <a href="/profile" className="absolute top-4 right-4">
         <img
-          src={user?.profilePic || "https://ui-avatars.com/api/?name=User&background=random"}
-          alt="Profile"
-          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
+        src={user?.profilePic || "https://ui-avatars.com/api/?name=User&background=random"}
+        alt="Profile"
+        className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
       </a>
+
       <div className="absolute top-4 left-4 text-2xl font-semibold text-white">The Memory</div>
+
       <div className="absolute top-16 left-4">
         <button
           onClick={() => window.history.back()}
@@ -98,7 +100,9 @@ export default function CalgaryPage() {
           Go Back
         </button>
       </div>
+
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Memory</h1>
+
       <div ref={mapContainerRef} className="w-full max-w-3xl h-96 rounded-lg shadow-lg mb-6"></div>
 
       <a

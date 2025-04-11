@@ -8,21 +8,25 @@ import { setUser, logoutUser } from "../redux/store.js"; // Import actions
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
-  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const router = useRouter();
+
   const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState(null);
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
 
   const defaultProfilePic = "https://ui-avatars.com/api/?name=User&background=random";
 
-  // Redirect to login if user is not logged in
+  // Wait for Redux to determine if user exists before redirecting
   useEffect(() => {
     if (!user && !isLoggingOut) {
       router.push("/login");
+    } else {
+      setCheckingAuth(false);
     }
-  }, [user, router]);
+  }, [user, isLoggingOut, router]);
 
-  // Fetch user profile data when userID is available
+  // Fetch profile data if user is valid
   useEffect(() => {
     if (user?.userID) {
       const fetchUserProfile = async () => {
@@ -48,14 +52,12 @@ export default function Profile() {
     }
   }, [user?.userID]);
 
-  // Logout Function
   const handleLogout = () => {
     setIsLoggingOut(true);
     dispatch(logoutUser());
     router.push("/");
   };
 
-  // Go to Home Page and update Redux with user info
   const handleGoHome = () => {
     if (profileData?.userID && profileData?.firstName && profileData?.lastName) {
       const updatedUser = {
@@ -70,6 +72,14 @@ export default function Profile() {
 
     router.push("/homePage");
   };
+
+  if (checkingAuth) {
+    return (
+      <div className="flex items-center justify-center min-h-screen bg-gray-100 text-gray-700">
+        <p className="text-xl font-medium">Loading profile...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
