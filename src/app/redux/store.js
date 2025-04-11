@@ -4,7 +4,7 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    userID: null, // ✅ Explicitly store userID in Redux
+    userID: null, 
     fullName: "",
     email: "",
     password: "",
@@ -13,11 +13,11 @@ const authSlice = createSlice({
   reducers: {
     setUser: (state, action) => {
       state.user = action.payload;
-      state.userID = action.payload.userID; // ✅ Store userID separately for easy access
+      state.userID = action.payload.userID;
     },
     logoutUser: (state) => {
       state.user = null;
-      state.userID = null; // ✅ Clear userID on logout
+      state.userID = null; 
       state.fullName = "";
       state.email = "";
       state.password = "";

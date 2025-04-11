@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser, logoutUser } from "../redux/store.js"; // Import actions
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
@@ -12,12 +12,13 @@ export default function Profile() {
   const router = useRouter();
   const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState(null);
-  const defaultProfilePic = "https://picsum.photos/200";
+
+  const defaultProfilePic = "https://ui-avatars.com/api/?name=User&background=random";
 
   // Redirect to login if user is not logged in
   useEffect(() => {
     if (!user && !isLoggingOut) {
-      router.push("/login"); // If no user, redirect to login
+      router.push("/login");
     }
   }, [user, router]);
 
@@ -50,12 +51,24 @@ export default function Profile() {
   // Logout Function
   const handleLogout = () => {
     setIsLoggingOut(true);
-    dispatch(logout()); // Dispatch logout action
-    router.push("/"); // Redirect to home page after logout
+    dispatch(logoutUser());
+    router.push("/");
   };
 
+  // Go to Home Page and update Redux with user info
   const handleGoHome = () => {
-    router.push("/homePage"); // Directly navigate to the home page
+    if (profileData?.userID && profileData?.firstName && profileData?.lastName) {
+      const updatedUser = {
+        userID: profileData.userID,
+        fullName: `${profileData.firstName} ${profileData.lastName}`,
+        email: profileData.email,
+        profilePic: profileData.profilePic || defaultProfilePic,
+      };
+
+      dispatch(setUser(updatedUser));
+    }
+
+    router.push("/homePage");
   };
 
   return (
@@ -63,12 +76,18 @@ export default function Profile() {
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">User Profile</h1>
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
         <img
-          src={user?.profilePic || "https://via.placeholder.com/150"}
+          src={profileData?.profilePic || defaultProfilePic}
           alt="Profile"
           className="w-32 h-32 rounded-full object-cover mb-4 mx-auto"
         />
-        <h2 className="text-xl font-bold text-center mb-2">{user?.fullName || "Guest User"}</h2>
-        <p className="text-center text-gray-500 mb-4">{user?.email || "No email available"}</p>
+        <h2 className="text-xl font-bold text-center mb-2">
+          {`${profileData?.firstName || "Guest"} ${profileData?.lastName || ""}`}
+        </h2>
+        <p className="text-center text-gray-500 mb-4">
+          {profileData?.email || "No email available"}
+        </p>
+
+        {error && <p className="text-red-500 text-center mb-4">{error}</p>}
 
         <div className="flex justify-center gap-4">
           <button
@@ -78,7 +97,7 @@ export default function Profile() {
             Logout
           </button>
           <button
-            onClick={handleGoHome} // This button navigates to the home page
+            onClick={handleGoHome}
             className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
           >
             Go to Home
