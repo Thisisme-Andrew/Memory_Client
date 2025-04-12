@@ -3,21 +3,23 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { setUser } from "../redux/store.js"; 
+import { setUser } from "../redux/store.js"; // Make sure this sets both user & userID properly
 
 export default function Signup() {
+  const dispatch = useDispatch();
+  const router = useRouter();
+
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
 
-  const dispatch = useDispatch();
-  const router = useRouter();
-
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(""); // reset error on each submit
 
+    // Validation
     if (!fullName || !email || !password || !confirmPassword) {
       setError("Please fill in all fields.");
       return;
@@ -33,12 +35,15 @@ export default function Signup() {
       return;
     }
 
-    // Split full name into first and last name
-    const nameParts = fullName.trim().split(" ");
-    const firstName = nameParts[0];
-    const lastName = nameParts.slice(1).join(" ") || "Unknown";
+    const [firstName, ...rest] = fullName.trim().split(" ");
+    const lastName = rest.join(" ") || "Unknown";
 
-    const user = { firstName, lastName, email, password };
+    const userPayload = {
+      firstName,
+      lastName,
+      email,
+      password,
+    };
 
     try {
       const response = await fetch(
@@ -46,43 +51,45 @@ export default function Signup() {
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(user),
+          body: JSON.stringify(userPayload),
         }
       );
 
-      const responseText = await response.text();
-      console.log("API Raw Response:", responseText);
+      const raw = await response.text();
+      console.log("API Raw Response:", raw);
 
       if (!response.ok) {
-        throw new Error(`Signup failed: ${responseText || "Unknown error"}`);
+        throw new Error(`Signup failed: ${raw || "Unknown error"}`);
       }
 
       let data;
       try {
-        data = JSON.parse(responseText);
-      } catch (err) {
-        console.error("JSON Parse Error:", err);
-        throw new Error("Invalid response format from server.");
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error("Invalid JSON response from server.");
       }
 
-      console.log("API Response:", data);
+      console.log("Parsed Response:", data);
 
       if (!data.userID) {
-        throw new Error("Signup succeeded, but no user ID was returned.");
+        throw new Error("Signup succeeded, but no user ID returned.");
       }
 
-      // Store user in Redux
-      dispatch(setUser({
-        userID: data.userID,
-        fullName: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-        profilePic: data.profilePic || "https://via.placeholder.com/150",
-      }));
+      // ✅ Store in Redux (make sure `setUser` sets both user and userID in your reducer)
+      dispatch(
+        setUser({
+          userID: data.userID,
+          fullName: `${data.firstName} ${data.lastName}`,
+          email: data.email,
+          profilePic: data.profilePic || "https://via.placeholder.com/150",
+        })
+      );
 
+      // ✅ Redirect to profile page (client-side)
       router.push("/profile");
     } catch (err) {
-      console.error("Signup Error:", err.message);
-      setError(err.message);
+      console.error("Signup Error:", err);
+      setError(err.message || "An error occurred during signup.");
     }
   };
 
@@ -120,11 +127,14 @@ export default function Signup() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="border border-gray-300 rounded px-4 py-2 w-full"
           />
-          <button type="submit" className="bg-black text-white rounded px-4 py-2 hover:bg-gray-800 transition">
+          <button
+            type="submit"
+            className="bg-black text-white rounded px-4 py-2 hover:bg-gray-800 transition"
+          >
             Sign Up
           </button>
         </form>
-        {error && <p className="text-red-500 text-sm">{error}</p>}
+        {error && <p className="text-red-500 text-sm mt-2">{error}</p>}
       </main>
     </div>
   );
