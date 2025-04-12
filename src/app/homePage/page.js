@@ -9,10 +9,25 @@ import "leaflet/dist/leaflet.css";
 export default function CalgaryPage() {
   const router = useRouter();
   const user = useSelector((state) => state.auth.user);
-  const userID = user?.userID;
+  const userID = useSelector((state) => state.auth.userID); // fallback
+
   const [memories, setMemories] = useState([]);
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
+
+  // Log redux user info
+  useEffect(() => {
+    console.log("Redux User:", user);
+    console.log("Redux UserID:", userID);
+  }, [user, userID]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user || !userID) {
+      console.warn("No user in Redux — redirecting to login.");
+      router.push("/login");
+    }
+  }, [user, userID, router]);
 
   useEffect(() => {
     const fetchMemories = async () => {
@@ -82,13 +97,17 @@ export default function CalgaryPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
-      <a href="/profile" className="absolute top-4 right-4">
+      {/* ✅ Client-side navigation to profile */}
+      <button
+        onClick={() => router.push("/profile")}
+        className="absolute top-4 right-4"
+      >
         <img
-        src={user?.profilePic || "https://ui-avatars.com/api/?name=User&background=random"}
-        alt="Profile"
-        className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
+          src={user?.profilePic || "https://ui-avatars.com/api/?name=User&background=random"}
+          alt="Profile"
+          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
-      </a>
+      </button>
 
       <div className="absolute top-4 left-4 text-2xl font-semibold text-white">The Memory</div>
 
@@ -105,20 +124,20 @@ export default function CalgaryPage() {
 
       <div ref={mapContainerRef} className="w-full max-w-3xl h-96 rounded-lg shadow-lg mb-6"></div>
 
-      <a
-        href="../newgallery"
+      <button
+        onClick={() => router.push("/newgallery")}
         className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
       >
         New Gallery
-      </a>
+      </button>
 
       <div className="absolute top-16 right-4">
-        <a
-          href="../allgalleries"
+        <button
+          onClick={() => router.push("/allgalleries")}
           className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           View All Galleries
-        </a>
+        </button>
       </div>
     </div>
   );

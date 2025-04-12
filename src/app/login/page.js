@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { useDispatch } from "react-redux";
-import { setUser } from "../redux/store.js"; // Redux actions
+import { useDispatch, useSelector } from "react-redux";
+import { setUser } from "../redux/store.js";
 
 export default function Login() {
   const [email, setEmailState] = useState("");
@@ -12,6 +12,12 @@ export default function Login() {
 
   const dispatch = useDispatch();
   const router = useRouter();
+
+  // Debug: log Redux state
+  const reduxUser = useSelector((state) => state.auth);
+  useEffect(() => {
+    console.log("Redux state (Login):", reduxUser);
+  }, [reduxUser]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -41,23 +47,15 @@ export default function Login() {
         throw new Error("Login failed. Please try again.");
       }
 
-      // Store user data in Redux
       dispatch(
         setUser({
           userID: data.userID,
           fullName: `${data.firstName} ${data.lastName}`,
           email: data.email,
-          profilePic: data.profilePic || "https://placehold.co/150", // Better placeholder
+          profilePic: data.profilePic || "https://placehold.co/150",
         })
       );
 
-      console.log("Redux state updated with user:", {
-        userID: data.userID,
-        fullName: `${data.firstName} ${data.lastName}`,
-        email: data.email,
-      });
-
-      // Redirect to profile page
       router.push("/profile");
     } catch (err) {
       console.error("Login Error:", err.message);

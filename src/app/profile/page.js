@@ -3,10 +3,11 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { setUser, logoutUser } from "../redux/store.js"; // Import actions
+import { setUser, logoutUser } from "../redux/store.js";
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
+  const reduxUser = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const router = useRouter();
 
@@ -17,7 +18,11 @@ export default function Profile() {
 
   const defaultProfilePic = "https://ui-avatars.com/api/?name=User&background=random";
 
-  // Wait for Redux to determine if user exists before redirecting
+  // Debug: log Redux state
+  useEffect(() => {
+    console.log("Redux state (Profile):", reduxUser);
+  }, [reduxUser]);
+
   useEffect(() => {
     if (!user && !isLoggingOut) {
       router.push("/login");
@@ -26,7 +31,6 @@ export default function Profile() {
     }
   }, [user, isLoggingOut, router]);
 
-  // Fetch profile data if user is valid
   useEffect(() => {
     if (user?.userID) {
       const fetchUserProfile = async () => {
