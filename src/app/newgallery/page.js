@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
+import { useSearchParams } from "next/navigation";
 
 export default function NewGalleryPage() {
+  const router = useRouter();
+  const user = useSelector((state) => state.auth.user);
+  const userID = useSelector((state) => state.auth.userID); // fallback
   const [name, setName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [latitude, setLatitude] = useState("");
@@ -11,6 +17,20 @@ export default function NewGalleryPage() {
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Log redux user info
+  useEffect(() => {
+    console.log("Redux User:", user);
+    console.log("Redux UserID:", userID);
+  }, [user, userID]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user || !userID) {
+      console.warn("No user in Redux — redirecting to login.");
+      router.push("/login");
+    }
+  }, [user, userID, router]);
 
   const handleImageChange = (e) => {
     setImageFiles([...e.target.files]);
@@ -41,7 +61,7 @@ export default function NewGalleryPage() {
   
       // Step 2: Create memory
       const memoryData = {
-        creatorID: 47, // Replace with actual user ID
+        creatorID: userID, // Replace with actual user ID
         name: name,
         isPrivate: isPrivate,
         latitude: parseFloat(latitude),

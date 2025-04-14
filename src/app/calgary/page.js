@@ -1,9 +1,14 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { useSelector } from "react-redux";
 import { useSearchParams } from "next/navigation";
 
 export default function MemoryPage() {
+  const router = useRouter();
+  const user = useSelector((state) => state.auth.user);
+  const userID = useSelector((state) => state.auth.userID); // fallback
   const searchParams = useSearchParams();
   const latM = parseFloat(searchParams.get("lat")) || 0;
   const lonM = parseFloat(searchParams.get("lon")) || 0;
@@ -14,11 +19,25 @@ export default function MemoryPage() {
   const [userLocation, setUserLocation] = useState({ lat: 0, lon: 0 }); // State for user's location
   const [loading, setLoading] = useState(true); // State for loading status
 
+  // Log redux user info
+  useEffect(() => {
+    console.log("Redux User:", user);
+    console.log("Redux UserID:", userID);
+  }, [user, userID]);
+
+  // Redirect to login if not authenticated
+  useEffect(() => {
+    if (!user || !userID) {
+      console.warn("No user in Redux — redirecting to login.");
+      router.push("/login");
+    }
+  }, [user, userID, router]);
+
   useEffect(() => {
     const fetchMemories = async () => {
       try {
         const response = await fetch(
-          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=47"
+          `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=${userID}`
         );
         const data = await response.json();
 
@@ -41,7 +60,7 @@ export default function MemoryPage() {
     };
 
     fetchMemories();
-  }, [latM, lonM]);
+  }, [latM, lonM, userID]);
 
   // Function to check if two coordinates are close
   const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 2) => {
