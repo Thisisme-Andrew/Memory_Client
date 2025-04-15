@@ -50,64 +50,87 @@ export default function galleryview() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid} Settings</h1>
 
       {console.log("memory is", memories.length)}
       
 
       {/* Main Image Section */}
-      <div className="flex w-full max-w-4xl items-center space-x-8">
+      <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">
         {/* Left Sidebar (Buttons) */}
-        <div className="flex flex-col space-y-4">
-          {/* Buttons Stacked Vertically */}
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
-            Add Images
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
-            Remove Images
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
-            Gallery Settings
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
-            Share Gallery
-          </button>
+        <div className="flex w-full flex-col space-y-4">
+
+            {/* Gallery Title */}
+            <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Title</h2>
+            <input
+            type="text"
+            placeholder="Title"
+            className="border border-gray-300 rounded px-4 py-2 w-full text-black"
+            />
+
+            {/* Gallery Members */}
+            <h2 className="text-2xl font-semibold drop-shadow-lg">Members</h2>
+            <div className="w-full h-40 overflow-y-auto border border-white-300 rounded px-4 py-2 space-y-2 custom-scrollbar">
+                {/* Row 1 */}
+                <div className="flex justify-between items-center">
+                    <span className="text-white">bobby@gmail.com</span>
+                    <select className="border border-white-300 px-4 py-2 rounded text-white text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option className="text-black">Admin</option>
+                        <option className="text-black">Collaborator</option>
+                        <option className="text-black">Remove Member</option>
+                    </select>
+                </div>
+
+                {/* Row 2 */}
+                <div className="flex justify-between items-center">
+                    <span className="text-white">gmail@bobby.com</span>
+                    <select className="border border-white px-4 py-2 rounded text-white text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option className="text-black">Admin</option>
+                        <option className="text-black">Collaborator</option>
+                        <option className="text-black">Remove Member</option>
+                    </select>
+                </div>
+
+                {/* Row 3 */}
+                <div className="flex justify-between items-center">
+                    <span className="text-white">com@bobby.gmail</span>
+                    <select className="border border-white px-4 py-2 rounded text-white text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option className="text-black">Admin</option>
+                        <option className="text-black">Collaborator</option>
+                        <option className="text-black">Remove Member</option>
+                    </select>
+                </div>
+
+                {/* Row 4 */}
+                <div className="flex justify-between items-center">
+                    <span className="text-white">bobby@com.gmail</span>
+                    <select className="border border-white px-4 py-2 rounded text-white text-center bg-transparent focus:outline-none focus:ring-2 focus:ring-blue-400">
+                        <option className="text-black">Admin</option>
+                        <option className="text-black">Collaborator</option>
+                        <option className="text-black">Remove Member</option>
+                    </select>
+                </div>       
+            </div>
+            <button className="bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
+                Add Member
+            </button>
+
+            {/* Save Changes and Cancel Buttons */}
+            <div className="flex w-full space-x-4">
+                <button className="w-1/2 bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
+                    Save Changes
+                </button>
+                <button className="w-1/2 bg-transparent text-white border border-white px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition">
+                    Cancel
+                </button>
+            </div>
         </div>
 
-        {memories.length > 0 &&
-        memories.map((memory) => {
-          if (memory.memoryID == currentid){
-            return (
-              <div key={memory.memoryID}>
-                <div className="w-2/3">
-                  <div>
-                    {memory.imageURLs.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Memory ${memory.memoryID} - Image ${index}`}
-                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
-                  <div className="space-y-4">
-                    {memory.imageURLs.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Memory ${memory.memoryID} - Image ${index}`}
-                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          }
-          return null; // Don't display this memory if coordinates are not similar
-        })}
+        <button className="self-end mt-2 bg-red-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-red-700 transition">
+            Delete Gallery
+        </button>
+
+
       </div>
 
       {/* Footer (Copyright info) */}
@@ -117,6 +140,12 @@ export default function galleryview() {
 
       {/* Custom Scrollbar Styles */}
       <style jsx>{`
+
+        .custom-scrollbar {
+            scrollbar-width: thin; /* Makes the scrollbar thinner */
+            scrollbar-color: #4c6ef5 #f0f0f0; /* thumb color and track color */
+        }
+            
         .custom-scrollbar::-webkit-scrollbar {
           width: 8px; /* Width of the scrollbar */
         }
