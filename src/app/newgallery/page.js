@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 
 export default function NewGalleryPage() {
   const [name, setName] = useState("");
@@ -11,6 +12,8 @@ export default function NewGalleryPage() {
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+
+  const router = useRouter();
 
   const handleImageChange = (e) => {
     setImageFiles([...e.target.files]);
@@ -89,6 +92,8 @@ export default function NewGalleryPage() {
       console.log("Images added:", imageData);
   
       setMessage("Memory and images created successfully!");
+      router.push(`/galleryview?memid=${createData.memoryID}`);
+
     } catch (error) {
       console.error("Error:", error);
       setMessage("Error creating memory or uploading images. Please try again.");

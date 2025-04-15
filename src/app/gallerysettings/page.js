@@ -31,6 +31,7 @@ export default function gallerysettings() {
   
   const saveChanges = async () => {
     try {
+
       await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editTitle",
         {
@@ -42,8 +43,8 @@ export default function gallerysettings() {
           }),
         }
       );
-
       console.log('Title Updated');
+
 
       await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editLongitudeLatitude",
@@ -53,7 +54,7 @@ export default function gallerysettings() {
           body: JSON.stringify({
             memoryID: currentid,
             longitude: parseFloat(newLongitude),
-            latidude: parseFloat(newLatitude)
+            latitude: parseFloat(newLatitude)
           }),
         }
       );
@@ -122,8 +123,10 @@ export default function gallerysettings() {
         const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
         const data = await response.json();
         console.log(data);
-        if (data.name != "") setTitle(data.name);
-        setNewTitle(title)
+        if (data.name !== "") {
+          setTitle(data.name);
+          setNewTitle(data.name);
+        }
         setLatitude(data.latitude);
         setNewLatitude(data.latitude);
         setLongitude(data.longitude);
