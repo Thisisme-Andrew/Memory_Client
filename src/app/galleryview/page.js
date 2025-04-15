@@ -1,13 +1,14 @@
-"use client"; // Add this to indicate this is a Client Component
+"use client";
 
 import { useEffect, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function galleryview() {
+export default function GalleryView() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
   const [images, setImages] = useState([]);
+  const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
     // Fetch memories from the database
@@ -16,49 +17,44 @@ export default function galleryview() {
         const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
         const data = await response.json();
         setImages(data.imageURLs);
+        if (images.length > 0) setSelectedImage(images[0])
+
       } catch (error) {
         console.error("Error fetching memory:", error);
       }
     };
 
     fetchMemory();
-  }, []);
+  }, [currentid]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
-      {/* Profile Picture */}
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative overflow-x-hidden">
       <a href="/profile" className="absolute top-4 right-4">
         <img
-          src="https://via.placeholder.com/50" // Replace this with the actual URL of the profile picture
+          src="https://via.placeholder.com/50"
           alt="Profile"
           className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
       </a>
 
-      {/* "The Memory" Text */}
       <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
         The Memory
       </div>
 
-      {/* Go Back Button */}
       <div className="absolute top-16 left-4">
         <button
-          onClick={() => window.history.back()} // Go back to the previous page
+          onClick={() => window.history.back()}
           className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           Go Back
         </button>
       </div>
 
-      {/* Page Header */}
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
-      
 
-      {/* Main Image Section */}
-      <div className="flex w-full max-w-4xl items-center space-x-8">
-        {/* Left Sidebar (Buttons) */}
+      <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
+        {/* Sidebar Buttons */}
         <div className="flex flex-col space-y-4">
-          {/* Buttons Stacked Vertically */}
           <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
             Add Images
           </button>
@@ -73,59 +69,59 @@ export default function galleryview() {
           </button>
         </div>
 
-        
-        <div key={currentid}>
-          <div className="w-2/3">
-            <div>
-              {images.map((url, index) => (
+        {/* Main Content */}
+        <div key={currentid} className="flex space-x-2 overflow-x-hidden">
+            {/* Main Selected Image */}
+            <div className="w-[500px] h-[500px] rounded-lg shadow-xl border-4 border-white flex items-center justify-center bg-white">
+              {selectedImage && (
                 <img
-                  key={index}
-                  src={url}
-                  alt={`Memory ${currentid} - Image ${index}`}
-                  className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                  src={selectedImage}
+                  alt="Selected Memory"
+                  className="object-contain max-w-full max-h-full rounded-lg"
                 />
-              ))}
+              )}
             </div>
-          </div>
-          <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
-            <div className="space-y-4">
-              {images.map((url, index) => (
-                <img
-                  key={index}
-                  src={url}
-                  alt={`Memory ${currentid} - Image ${index}`}
-                  className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
-                />
-              ))}
+
+            {/* Scrollable Thumbnails */}
+            <div className="w-40 h-[500px]">
+              <div className="space-y-4">
+                {images.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Thumbnail ${index}`}
+                    onClick={() => setSelectedImage(url)}
+                    className={`w-full h-24 rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
+                    selectedImage === url ? "border-yellow-400 scale-105" : "border-white"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
         </div>
-      </div>
 
-      {/* Footer (Copyright info) */}
       <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
         &copy; {new Date().getFullYear()} The Memory. All rights reserved.
       </footer>
 
-      {/* Custom Scrollbar Styles */}
       <style jsx>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 8px; /* Width of the scrollbar */
+          width: 8px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #4c6ef5; /* Thumb color */
-          border-radius: 10px; /* Rounded corners */
-          transition: background-color 0.3s ease; /* Smooth transition for hover effect */
+          background-color: #4c6ef5;
+          border-radius: 10px;
         }
 
         .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: #2b4ca1; /* Darker color on hover */
+          background-color: #2b4ca1;
         }
 
         .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f0f0f0; /* Track color */
-          border-radius: 10px; /* Rounded corners */
+          background: #f0f0f0;
+          border-radius: 10px;
         }
       `}</style>
     </div>
