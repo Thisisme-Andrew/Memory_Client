@@ -1,26 +1,27 @@
 "use client"; // Add this to indicate this is a Client Component
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function galleryview() {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
-  const [memories, setMemories] = useState([]);
+  const [images, setImages] = useState([]);
 
   useEffect(() => {
     // Fetch memories from the database
-    const fetchMemories = async () => {
+    const fetchMemory = async () => {
       try {
-        const response = await fetch("https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllByUser?creatorID=47");
+        const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
         const data = await response.json();
-        setMemories(data);
+        setImages(data.imageURLs);
       } catch (error) {
-        console.error("Error fetching memories:", error);
+        console.error("Error fetching memory:", error);
       }
     };
 
-    fetchMemories();
+    fetchMemory();
   }, []);
 
   return (
@@ -51,8 +52,6 @@ export default function galleryview() {
 
       {/* Page Header */}
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
-
-      {console.log("memory is", memories.length)}
       
 
       {/* Main Image Section */}
@@ -66,7 +65,7 @@ export default function galleryview() {
           <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
             Remove Images
           </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
+          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
             Gallery Settings
           </button>
           <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
@@ -74,40 +73,33 @@ export default function galleryview() {
           </button>
         </div>
 
-        {memories.length > 0 &&
-        memories.map((memory) => {
-          if (memory.memoryID == currentid){
-            return (
-              <div key={memory.memoryID}>
-                <div className="w-2/3">
-                  <div>
-                    {memory.imageURLs.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Memory ${memory.memoryID} - Image ${index}`}
-                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                </div>
-                <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
-                  <div className="space-y-4">
-                    {memory.imageURLs.map((url, index) => (
-                      <img
-                        key={index}
-                        src={url}
-                        alt={`Memory ${memory.memoryID} - Image ${index}`}
-                        className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
-                      />
-                    ))}
-                  </div>
-                </div>
-              </div>
-            );
-          }
-          return null; // Don't display this memory if coordinates are not similar
-        })}
+        
+        <div key={currentid}>
+          <div className="w-2/3">
+            <div>
+              {images.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Memory ${currentid} - Image ${index}`}
+                  className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                />
+              ))}
+            </div>
+          </div>
+          <div className="w-40 h-96 overflow-y-auto custom-scrollbar">
+            <div className="space-y-4">
+              {images.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Memory ${currentid} - Image ${index}`}
+                  className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                />
+              ))}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Footer (Copyright info) */}
