@@ -1,12 +1,18 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router";  // Import useRouter from next/router
+import { Suspense } from "react";
 
 export default function MemoryPage() {
-  const searchParams = useSearchParams();
-  const latM = parseFloat(searchParams.get("lat")) || 0;
-  const lonM = parseFloat(searchParams.get("lon")) || 0;
+  const router = useRouter(); // Initialize the router
+
+  // Access query parameters directly from router.query
+  const { lat, lon } = router.query; // Get latitude and longitude from query
+
+  const latM = parseFloat(lat) || 0;
+  const lonM = parseFloat(lon) || 0;
+
   const [createdMemories, setCreatedMemories] = useState([]);
   const [collaboratedMemories, setCollaboratedMemories] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // State for search input
@@ -23,9 +29,8 @@ export default function MemoryPage() {
         const data = await response.json();
 
         // Filter created and collaborated memories based on proximity
-        const closeCreatedMemories = data.createdMemories
-
-        const closeCollaboratedMemories = data.collaboratedMemories
+        const closeCreatedMemories = data.createdMemories;
+        const closeCollaboratedMemories = data.collaboratedMemories;
 
         setCreatedMemories(closeCreatedMemories);
         setCollaboratedMemories(closeCollaboratedMemories);

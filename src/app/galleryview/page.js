@@ -1,31 +1,35 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
+import { useRouter } from "next/router"; // Use next/router instead of useSearchParams
+import { Suspense } from "react";
 
 export default function GalleryView() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const currentid = parseInt(searchParams.get("memid"));
+  const { memid } = router.query; // Extract 'memid' from the query params
+  
   const [images, setImages] = useState([]);
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
-    // Fetch memories from the database
+    if (!memid) return; // Wait until the `memid` is available
+    
+    const currentid = parseInt(memid); // Convert to integer
+
+    // Fetch memory data from the API
     const fetchMemory = async () => {
       try {
         const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
         const data = await response.json();
         setImages(data.imageURLs);
-        if (images.length > 0) setSelectedImage(images[0])
-
+        if (data.imageURLs.length > 0) setSelectedImage(data.imageURLs[0]);
       } catch (error) {
         console.error("Error fetching memory:", error);
       }
     };
 
     fetchMemory();
-  }, [currentid]);
+  }, [memid]); // Run this effect whenever `memid` changes
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative overflow-x-hidden">
@@ -50,7 +54,7 @@ export default function GalleryView() {
         </button>
       </div>
 
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {memid}</h1>
 
       <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
         {/* Sidebar Buttons */}
@@ -61,7 +65,7 @@ export default function GalleryView() {
           <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
             Remove Images
           </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
+          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${memid}`)}>
             Gallery Settings
           </button>
           <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition">
@@ -70,7 +74,7 @@ export default function GalleryView() {
         </div>
 
         {/* Main Content */}
-        <div key={currentid} className="flex space-x-2 overflow-x-hidden">
+        <div key={memid} className="flex space-x-2 overflow-x-hidden">
             {/* Main Selected Image */}
             <div className="w-[500px] h-[500px] rounded-lg shadow-xl border-4 border-white flex items-center justify-center bg-white">
               {selectedImage && (

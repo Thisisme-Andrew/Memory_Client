@@ -1,12 +1,16 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useRouter } from "next/router"; // Use next/router to access query parameters
+import { Suspense } from "react";
 
 export default function MemoryPage() {
-  const searchParams = useSearchParams();
-  const latM = parseFloat(searchParams.get("lat")) || 0;
-  const lonM = parseFloat(searchParams.get("lon")) || 0;
+  const router = useRouter();
+  const { lat, lon } = router.query; // Extract lat and lon from query params
+  
+  const latM = parseFloat(lat) || 0;
+  const lonM = parseFloat(lon) || 0;
+
   const [createdMemories, setCreatedMemories] = useState([]);
   const [collaboratedMemories, setCollaboratedMemories] = useState([]);
   const [searchQuery, setSearchQuery] = useState(""); // State for search input

@@ -2,14 +2,13 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 
 export default function gallerysettings() {
-  const searchParams = useSearchParams();
   const router = useRouter();
-  const currentid = parseInt(searchParams.get("memid"));
 
-  // Title
+  // Get the memory ID (memid) from the URL using router.query
+  const { memid } = router.query;
+
   const [title, setTitle] = useState("Untitled Gallery");
   const [newTitle, setNewTitle] = useState("");
 
@@ -28,23 +27,21 @@ export default function gallerysettings() {
   const [toRemove, setToRemove] = useState([]);
   const [showAddCollaboratorsModal, setShowAddCollaboratorsModal] = useState(false);
   const [modalCollaborators, setModalCollaborators] = useState([]);
-  
+
   const saveChanges = async () => {
     try {
-
       await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editTitle",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            memoryID: currentid,
+            memoryID: memid,
             title: newTitle
           }),
         }
       );
       console.log('Title Updated');
-
 
       await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editLongitudeLatitude",
@@ -52,7 +49,7 @@ export default function gallerysettings() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            memoryID: currentid,
+            memoryID: memid,
             longitude: parseFloat(newLongitude),
             latitude: parseFloat(newLatitude)
           }),
@@ -67,7 +64,7 @@ export default function gallerysettings() {
           method: "DELETE",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            memoryID: currentid,
+            memoryID: memid,
             collaborators: toRemove
           }),
         }
@@ -81,14 +78,14 @@ export default function gallerysettings() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            memoryID: currentid,
+            memoryID: memid,
             collaborators: newCollaborators
           }),
         }
       );
-  
+
       console.log('Collaborators Added');
-      router.push(`/galleryview?memid=${currentid}`);
+      router.push(`/galleryview?memid=${memid}`);
     } catch (error) {
       console.error('Error saving changes:', error);
     }
@@ -103,24 +100,26 @@ export default function gallerysettings() {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({
-              memoryID: currentid
+              memoryID: memid
             }),
           }
         );
-    
+
         console.log('Memory Deleted');
         router.push(`/allgalleries`);
       } catch (error) {
-        console.error('Error deleting gallery:', error)
+        console.error('Error deleting gallery:', error);
       }
     }
-  }
+  };
 
   useEffect(() => {
+    if (!memid) return; // Wait until memid is available
+
     // Fetch memory from the database
     const fetchMemory = async () => {
       try {
-        const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
+        const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${memid}`);
         const data = await response.json();
         console.log(data);
         if (data.name !== "") {
@@ -139,8 +138,7 @@ export default function gallerysettings() {
     };
 
     fetchMemory();
-  }, []);
-
+  }, [memid]); // Use memid as a dependency to refetch if it changes
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
@@ -169,12 +167,10 @@ export default function gallerysettings() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid} Settings</h1>
-      
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {memid} Settings</h1>
 
       <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">
         <div className="flex w-full flex-col space-y-4">
-
             {/* Gallery Title */}
             <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Title</h2>
             <input
@@ -187,7 +183,6 @@ export default function gallerysettings() {
             {/* Gallery Coordinates */}
             <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Coordinates</h2>
             <div className="flex w-full space-x-4">
-
               {/* Latitude */}
               <div className="flex flex-col w-full">
                 <h2 className="text-1xl font-semibold drop-shadow-lg">Latitude</h2>
@@ -216,7 +211,6 @@ export default function gallerysettings() {
             {/* Gallery Members */}
             <h2 className="text-2xl font-semibold drop-shadow-lg">Members</h2>
             <div className="w-full h-40 overflow-y-auto border border-white-300 rounded px-4 py-2 space-y-2 custom-scrollbar">
-                
                 {/* Owner */}
                 <div className="flex justify-between items-center">
                     <span className="text-white">User {owner}</span>
@@ -248,108 +242,56 @@ export default function gallerysettings() {
                 ))}   
             </div>
             <button 
-              className="bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+              className="bg-blue-600 py-2 px-8 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-500 transition"
               onClick={() => setShowAddCollaboratorsModal(true)}>
-                Add Collaborators
+              Add Collaborator
             </button>
 
-            {/* Save Changes and Cancel Buttons */}
-            <div className="flex w-full space-x-4">
-                <button className="w-1/2 bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition" onClick={() => saveChanges()}>
-                    Save Changes and Exit
+            {/* Modal for Adding Collaborators */}
+            {showAddCollaboratorsModal && (
+            <div className="fixed top-0 left-0 w-full h-full flex items-center justify-center bg-black bg-opacity-50">
+                <div className="bg-white rounded-lg p-8 space-y-4">
+                <h3 className="text-2xl font-semibold">Add Collaborator</h3>
+                <input 
+                    type="text" 
+                    placeholder="Enter User ID"
+                    onChange={(e) => setModalCollaborators([e.target.value])}
+                    className="border border-gray-300 rounded px-4 py-2 w-full"
+                />
+                <div className="flex justify-end space-x-4">
+                <button 
+                    className="bg-red-600 text-white py-2 px-6 rounded-full text-lg font-semibold hover:bg-red-500 transition"
+                    onClick={() => setShowAddCollaboratorsModal(false)}>
+                    Cancel
                 </button>
-                <button className="w-1/2 bg-transparent text-white border border-white px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/galleryview?memid=${currentid}`)}>
-                    Exit Without Saving
+                <button 
+                    className="bg-blue-600 text-white py-2 px-6 rounded-full text-lg font-semibold hover:bg-blue-500 transition"
+                    onClick={() => {
+                    setNewCollaborators(prev => [...prev, ...modalCollaborators]);
+                    setShowAddCollaboratorsModal(false);
+                    }}>
+                    Add
+                </button>
+                </div>
+                </div>
+            </div>
+            )}
+
+            {/* Save and Delete Buttons */}
+            <div className="flex justify-between w-full mt-6">
+                <button 
+                  onClick={deleteGallery}
+                  className="bg-red-600 text-white py-2 px-8 rounded-full text-lg font-semibold shadow-lg hover:bg-red-500 transition">
+                  Delete Gallery
+                </button>
+                <button 
+                  onClick={saveChanges}
+                  className="bg-blue-600 text-white py-2 px-8 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-500 transition">
+                  Save Changes
                 </button>
             </div>
         </div>
-
-        <button className="self-end mt-2 bg-red-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-red-700 transition" onClick={() => deleteGallery()}>
-            Delete Gallery
-        </button>
-
-
       </div>
-
-
-      {showAddCollaboratorsModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
-          <div className="bg-gradient-to-br from-purple-600 to-blue-500 text-white rounded-lg shadow-xl p-6 w-full max-w-md">
-            <h2 className="text-xl font-semibold drop-shadow-lg mb-4">Add Collaborators</h2>
-            <input
-              type="text"
-              value={modalCollaborators}
-              onChange={(e) => setModalCollaborators(e.target.value)}
-              placeholder="Enter Collaborator IDs Seperated by Commas"
-              className="w-full px-4 py-2 border border-gray-300 rounded text-black mb-4"
-            />
-            <div className="flex justify-end space-x-4">
-              <button
-                onClick={() => {
-                  // Add collaborator logic
-                  setNewCollaborators((prev) => [
-                    ...new Set([
-                      ...prev,
-                      ...modalCollaborators
-                        .split(",") // Split input by commas
-                        .map((id) => id.trim()) // Trim any extra spaces around the IDs
-                        .map((id) => parseInt(id)) // Convert to numbers
-                        .filter((id) => !isNaN(id)), // Filter out any non-number values,
-                    ])
-                  ]);
-                  setModalCollaborators("");
-                  setShowAddCollaboratorsModal(false);
-                  
-                }}
-                className="w-1/2 bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
-              >
-                Add
-              </button>
-              <button
-                onClick={() => {
-                  setModalCollaborators("");
-                  setShowAddCollaboratorsModal(false);
-                }}
-                className="w-1/2 bg-transparent text-white border border-white px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition"
-              >
-                Cancel
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {/* Footer (Copyright info) */}
-      <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
-        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
-      </footer>
-
-      {/* Custom Scrollbar Styles */}
-      <style jsx>{`
-
-        .custom-scrollbar {
-            scrollbar-width: thin; /* Makes the scrollbar thinner */
-            scrollbar-color: #4c6ef5 #f0f0f0; /* thumb color and track color */
-        }
-            
-        .custom-scrollbar::-webkit-scrollbar {
-          width: 8px; /* Width of the scrollbar */
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb {
-          background-color: #4c6ef5; /* Thumb color */
-          border-radius: 10px; /* Rounded corners */
-          transition: background-color 0.3s ease; /* Smooth transition for hover effect */
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-          background-color: #2b4ca1; /* Darker color on hover */
-        }
-
-        .custom-scrollbar::-webkit-scrollbar-track {
-          background: #f0f0f0; /* Track color */
-          border-radius: 10px; /* Rounded corners */
-        }
-      `}</style>
     </div>
   );
 }
