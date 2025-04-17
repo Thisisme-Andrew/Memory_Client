@@ -4,6 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 
 export default function NewGalleryPage() {
   const user = useSelector((state) => state.auth.user);
