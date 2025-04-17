@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
 
 export default function NewGalleryPage() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [name, setName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
   const [latitude, setLatitude] = useState("");
@@ -14,6 +19,18 @@ export default function NewGalleryPage() {
   const [message, setMessage] = useState("");
 
   const router = useRouter();
+
+  useEffect(() => {
+      const storedUser = sessionStorage.getItem("user");
+      if (!storedUser && !isLoggingOut) {
+        router.push("/login"); // If no user, redirect to login
+      } else {
+        const userData = JSON.parse(storedUser);
+        if (userData) {
+          dispatch(setUser(userData)); // Set the Redux state if user data is available
+      }
+    }
+  }, [router, isLoggingOut, dispatch]);
 
   const handleImageChange = (e) => {
     setImageFiles([...e.target.files]);
@@ -44,7 +61,7 @@ export default function NewGalleryPage() {
   
       // Step 2: Create memory
       const memoryData = {
-        creatorID: 47, // Replace with actual user ID
+        creatorID: user.userID, // Replace with actual user ID
         name: name,
         isPrivate: isPrivate,
         latitude: parseFloat(latitude),

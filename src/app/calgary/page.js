@@ -1,9 +1,17 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState, useRef } from "react";
+import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 import { useSearchParams } from "next/navigation";
 
 export default function MemoryPage() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
+  const router = useRouter();
   const searchParams = useSearchParams();
   const latM = parseFloat(searchParams.get("lat")) || 0;
   const lonM = parseFloat(searchParams.get("lon")) || 0;
@@ -14,34 +22,49 @@ export default function MemoryPage() {
   const [userLocation, setUserLocation] = useState({ lat: 0, lon: 0 }); // State for user's location
   const [loading, setLoading] = useState(true); // State for loading status
 
+  // Redirect to login if user is not logged in
   useEffect(() => {
-    const fetchMemories = async () => {
-      try {
-        const response = await fetch(
-          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=47"
-        );
-        const data = await response.json();
-
-        // Filter created and collaborated memories based on proximity
-        const closeCreatedMemories = data.createdMemories.filter((memory) =>
-          areCoordinatesSimilar(parseFloat(memory.latitude), parseFloat(memory.longitude), latM, lonM)
-        );
-
-        const closeCollaboratedMemories = data.collaboratedMemories.filter((memory) =>
-          areCoordinatesSimilar(parseFloat(memory.latitude), parseFloat(memory.longitude), latM, lonM)
-        );
-
-        setCreatedMemories(closeCreatedMemories);
-        setCollaboratedMemories(closeCollaboratedMemories);
-      } catch (error) {
-        console.error("Error fetching memories:", error);
-      } finally {
-        setLoading(false); // Set loading to false after data is fetched
+    const storedUser = sessionStorage.getItem("user");
+    if (!storedUser && !isLoggingOut) {
+      router.push("/login"); // If no user, redirect to login
+    } else {
+      const userData = JSON.parse(storedUser);
+      if (userData) {
+        dispatch(setUser(userData)); // Set the Redux state if user data is available
       }
-    };
+    }
+  }, [router, isLoggingOut, dispatch]);
 
-    fetchMemories();
-  }, [latM, lonM]);
+  useEffect(() => {
+    if (user?.userID){
+      const fetchMemories = async () => {
+        try {
+          const response = await fetch(
+            `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=${user.userID}`
+          );
+          const data = await response.json();
+  
+          // Filter created and collaborated memories based on proximity
+          const closeCreatedMemories = data.createdMemories.filter((memory) =>
+            areCoordinatesSimilar(parseFloat(memory.latitude), parseFloat(memory.longitude), latM, lonM)
+          );
+  
+          const closeCollaboratedMemories = data.collaboratedMemories.filter((memory) =>
+            areCoordinatesSimilar(parseFloat(memory.latitude), parseFloat(memory.longitude), latM, lonM)
+          );
+  
+          setCreatedMemories(closeCreatedMemories);
+          setCollaboratedMemories(closeCollaboratedMemories);
+        } catch (error) {
+          console.error("Error fetching memories:", error);
+        } finally {
+          setLoading(false); // Set loading to false after data is fetched
+        }
+      };
+  
+      fetchMemories();
+    }
+  }, [latM, lonM, user?.userID]);
 
   // Function to check if two coordinates are close
   const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 2) => {
