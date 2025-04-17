@@ -1,4 +1,4 @@
-"use client";
+"use client"; // Ensures this component is only rendered client-side
 
 import { MapContainer, TileLayer } from "react-leaflet";
 import { useState, useEffect } from "react";
@@ -8,6 +8,7 @@ import L from "leaflet"; // Import Leaflet directly to use its methods
 export default function Home() {
   const [clickedLocation, setClickedLocation] = useState(null);
   const [mapInstance, setMapInstance] = useState(null);
+  const [isClient, setIsClient] = useState(false); // Add state to track client-side rendering
 
   // Function to handle map click event
   const handleMapClick = (event) => {
@@ -21,6 +22,16 @@ export default function Home() {
   const handleMapCreated = (map) => {
     setMapInstance(map);
   };
+
+  useEffect(() => {
+    // Only run this effect on the client-side
+    setIsClient(true);
+  }, []);
+
+  if (!isClient) {
+    // Return null or a loading component if the component is rendered on the server
+    return <div>Loading...</div>;
+  }
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen">
