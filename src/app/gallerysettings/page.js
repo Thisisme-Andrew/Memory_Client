@@ -1,10 +1,16 @@
 "use client"; // Add this to indicate this is a Client Component
 
-import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 import { useSearchParams } from "next/navigation";
 
 export default function gallerysettings() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
@@ -115,6 +121,18 @@ export default function gallerysettings() {
       }
     }
   }
+
+  useEffect(() => {
+      const storedUser = sessionStorage.getItem("user");
+      if (!storedUser && !isLoggingOut) {
+        router.push("/login"); // If no user, redirect to login
+      } else {
+        const userData = JSON.parse(storedUser);
+        if (userData) {
+          dispatch(setUser(userData)); // Set the Redux state if user data is available
+      }
+    }
+  }, [router, isLoggingOut, dispatch]);
 
   useEffect(() => {
     // Fetch memory from the database

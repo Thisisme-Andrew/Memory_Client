@@ -1,9 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { useEffect, useState, useRef } from "react";
+import { logoutUser } from "../redux/store.js"; // Import logout action
+import { setUser } from "../redux/store.js"; // Redux actions
 import { useSearchParams, useRouter } from "next/navigation";
 
 export default function GalleryView() {
+  const user = useSelector((state) => state.auth.user);
+  const dispatch = useDispatch();
+  const [isLoggingOut, setIsLoggingOut] = useState(false);
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
@@ -11,11 +17,24 @@ export default function GalleryView() {
   const [selectedImage, setSelectedImage] = useState(null);
 
   useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (!storedUser && !isLoggingOut) {
+      router.push("/login"); // If no user, redirect to login
+    } else {
+      const userData = JSON.parse(storedUser);
+      if (userData) {
+        dispatch(setUser(userData)); // Set the Redux state if user data is available
+    }
+  }
+}, [router, isLoggingOut, dispatch]);
+
+  useEffect(() => {
     // Fetch memories from the database
     const fetchMemory = async () => {
       try {
         const response = await fetch(`https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/${currentid}`);
         const data = await response.json();
+        
         setImages(data.imageURLs);
         if (images.length > 0) setSelectedImage(images[0])
 
