@@ -193,26 +193,29 @@ export default function GalleryView() {
         {/* Main Content */}
         <div key={currentid} className="flex space-x-2 overflow-x-hidden">
             {/* Main Selected Image */}
-            <div className="w-[500px] h-[500px] rounded-lg shadow-xl border-4 border-white flex items-center justify-center bg-white">
-              {typeof selectedImage === "number" && (
-                <img
-                  src={images[selectedImage]}
-                  alt="Selected Memory"
-                  className="object-contain max-w-full max-h-full rounded-lg"
-                />
-              )}
-            </div>
+            <div className="flex items-center justify-center">
+            <div className="border-4 border-white rounded-lg shadow-xl -mt-28">
+            {typeof selectedImage === "number" && (
+              <img
+                src={images[selectedImage]}
+                alt="Selected Memory"
+                className="rounded-md max-w-[500px] max-h-[500px] w-full h-full object-contain block"
+              />
+            )}
+          </div>
+        </div>
+
 
             {/* Scrollable Thumbnails */}
             <div className="w-40 h-[500px]">
-              <div className="space-y-4">
+              <div className="space-y">
                 {images.map((url, index) => (
                   <img
                     key={index}
                     src={url}
                     alt={`Thumbnail ${index}`}
                     onClick={() => setSelectedImage(index)}
-                    className={`w-full h-24 rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
+                    className={`w-auto h-auto rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
                     selectedImage === index ? "border-yellow-400 scale-105" : "border-white"
                     }`}
                   />
