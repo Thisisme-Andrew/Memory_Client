@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { setUser } from "../redux/store.js"; 
+import { setUser } from "../redux/store.js";
 
 export default function Signup() {
   const [fullName, setFullName] = useState("");
@@ -33,7 +33,6 @@ export default function Signup() {
       return;
     }
 
-    // Split full name into first and last name
     const nameParts = fullName.trim().split(" ");
     const firstName = nameParts[0];
     const lastName = nameParts.slice(1).join(" ") || "Unknown";
@@ -71,7 +70,6 @@ export default function Signup() {
         throw new Error("Signup succeeded, but no user ID was returned.");
       }
 
-      // Store user in Redux
       dispatch(setUser({
         userID: data.userID,
         fullName: `${data.firstName} ${data.lastName}`,
@@ -124,7 +122,20 @@ export default function Signup() {
             Sign Up
           </button>
         </form>
+
+        {/* Show Error if exists */}
         {error && <p className="text-red-500 text-sm">{error}</p>}
+
+        {/* 🔗 Link to Login Page */}
+        <p className="text-sm text-gray-600">
+          Already have an account?{" "}
+          <span
+            onClick={() => router.push("/login")}
+            className="text-blue-600 hover:underline cursor-pointer"
+          >
+            Log in
+          </span>
+        </p>
       </main>
     </div>
   );

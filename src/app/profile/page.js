@@ -3,8 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { logoutUser } from "../redux/store.js"; // Import logout action
-import { setUser } from "../redux/store.js"; // Redux actions
+import { logoutUser, setUser } from "../redux/store.js"; // Redux actions
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
@@ -15,20 +14,18 @@ export default function Profile() {
   const [error, setError] = useState(null);
   const defaultProfilePic = "https://picsum.photos/200";
 
-  // Redirect to login if user is not logged in
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser && !isLoggingOut) {
-      router.push("/login"); // If no user, redirect to login
+      router.push("/login");
     } else {
       const userData = JSON.parse(storedUser);
       if (userData) {
-        dispatch(setUser(userData)); // Set the Redux state if user data is available
+        dispatch(setUser(userData));
       }
     }
   }, [router, isLoggingOut, dispatch]);
 
-  // Fetch user profile data when userID is available
   useEffect(() => {
     if (user?.userID) {
       const fetchUserProfile = async () => {
@@ -54,16 +51,15 @@ export default function Profile() {
     }
   }, [user?.userID]);
 
-  // Logout Function
   const handleLogout = () => {
     setIsLoggingOut(true);
     sessionStorage.removeItem("user");
-    dispatch(logoutUser()); // Dispatch logout action
-    router.push("/"); // Redirect to home page after logout
+    dispatch(logoutUser());
+    router.push("/");
   };
 
   const handleGoHome = () => {
-    router.push("/homePage"); // Directly navigate to the home page
+    router.push("/homePage");
   };
 
   return (
@@ -71,12 +67,19 @@ export default function Profile() {
       <h1 className="text-3xl font-semibold text-gray-800 mb-4">User Profile</h1>
       <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
         <img
-          src={user?.profilePic || "https://via.placeholder.com/150"}
+          src={user?.profilePic || defaultProfilePic}
           alt="Profile"
           className="w-32 h-32 rounded-full object-cover mb-4 mx-auto"
         />
-        <h2 className="text-xl font-bold text-center mb-2">{user?.fullName || "Guest User"}</h2>
-        <p className="text-center text-gray-500 mb-4">{user?.email || "No email available"}</p>
+        <h2 className="text-xl font-bold text-center mb-1">{user?.fullName || "Guest User"}</h2>
+        <p className="text-center text-gray-500 mb-1">{user?.email || "No email available"}</p>
+
+        {/* 🆔 Display UID Here */}
+        {user?.userID && (
+          <p className="text-center text-sm text-gray-400 mb-4">
+            UID: <span className="font-mono">{user.userID}</span>
+          </p>
+        )}
 
         <div className="flex justify-center gap-4">
           <button
@@ -86,7 +89,7 @@ export default function Profile() {
             Logout
           </button>
           <button
-            onClick={handleGoHome} // This button navigates to the home page
+            onClick={handleGoHome}
             className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
           >
             Go to Home
