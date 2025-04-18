@@ -44,10 +44,12 @@ export default function NewGalleryPage() {
       .map((id) => parseInt(id)) // Convert to numbers
       .filter((id) => !isNaN(id)); // Filter out any non-number values
   
-    setCollaborators((prevCollaborators) => {
-      const newCollaborators = [...new Set([...prevCollaborators, ...userIds])]; // Add new IDs and ensure uniqueness
-      return newCollaborators;
-    });
+
+      setCollaborators(userIds);
+    //setCollaborators((prevCollaborators) => {
+      //const newCollaborators = [...new Set([...prevCollaborators, ...userIds])]; // Add new IDs and ensure uniqueness
+      //return newCollaborators;
+    //});
   };
   
 
