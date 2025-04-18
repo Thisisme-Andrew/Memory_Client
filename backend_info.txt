@@ -176,8 +176,8 @@ BASE URL: https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/
   - Output:
     - in the data there is an object with some general information
 
-10. retrieveAllMemories
-  - endpoint: '/all'
+10. removeImages
+  - endpoint: '/removeImages'
   - type: delete
   - Input and types: 
     - An object with:

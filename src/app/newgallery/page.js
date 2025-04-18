@@ -133,7 +133,6 @@ export default function NewGalleryPage() {
     return urls;
   };
 
-  // Mock image upload function (replace with your actual upload logic)
   const uploadImageToServer = async (file) => {
     const blobName = `${Date.now()}-${file.name}`;
     const uploadUrl = `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}?${process.env.NEXT_PUBLIC_AZURE_SAS_TOKEN}`;
