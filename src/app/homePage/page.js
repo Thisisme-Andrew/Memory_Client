@@ -3,8 +3,7 @@
 import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
-import { logoutUser } from "../redux/store.js"; // Import logout action
-import { setUser } from "../redux/store.js"; // Redux actions
+import { logoutUser, setUser } from "../redux/store.js";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
 
@@ -17,40 +16,38 @@ export default function CalgaryPage() {
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
 
-  // Redirect to login if user is not logged in
-    useEffect(() => {
-      const storedUser = sessionStorage.getItem("user");
-      if (!storedUser && !isLoggingOut) {
-        router.push("/login"); // If no user, redirect to login
-      } else {
-        const userData = JSON.parse(storedUser);
-        if (userData) {
-          dispatch(setUser(userData)); // Set the Redux state if user data is available
-        }
+  useEffect(() => {
+    const storedUser = sessionStorage.getItem("user");
+    if (!storedUser && !isLoggingOut) {
+      router.push("/login");
+    } else {
+      const userData = JSON.parse(storedUser);
+      if (userData) {
+        dispatch(setUser(userData));
       }
-    }, [router, isLoggingOut, dispatch]);
+    }
+  }, [router, isLoggingOut, dispatch]);
 
   useEffect(() => {
-    if (user?.userID){
+    if (user?.userID) {
       const fetchMemories = async () => {
         try {
           const response = await fetch(
             `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=${user.userID}`
           );
           const data = await response.json();
-  
-          // Merging both createdMemories and collaboratedMemories
+
           const allMemories = [
             ...(data.createdMemories || []),
             ...(data.collaboratedMemories || []),
           ];
-  
+
           setMemories(allMemories);
         } catch (err) {
           console.error("Error fetching memories:", err);
         }
       };
-  
+
       fetchMemories();
     }
   }, [user?.userID]);
@@ -87,9 +84,14 @@ export default function CalgaryPage() {
       memories.forEach((memory) => {
         const { memoryID, latitude, longitude } = memory;
         if (latitude && longitude) {
-          const marker = L.marker([parseFloat(latitude), parseFloat(longitude)], { icon: starIcon })
+          const marker = L.marker(
+            [parseFloat(latitude), parseFloat(longitude)],
+            { icon: starIcon }
+          )
             .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
-            .on("click", () => router.push(`/calgary?lat=${latitude}&lon=${longitude}`));
+            .on("click", () =>
+              router.push(`/calgary?lat=${latitude}&lon=${longitude}`)
+            );
 
           marker.addTo(map);
         }
@@ -98,38 +100,59 @@ export default function CalgaryPage() {
   }, [memories, map, router]);
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
+      
+      {/* Profile Image */}
       <a href="/profile" className="absolute top-4 right-4">
         <img
           src="https://via.placeholder.com/50"
           alt="Profile"
-          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
+          className="w-9 h-9 sm:w-12 sm:h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
       </a>
-      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">The Memory</div>
-      <div className="absolute top-16 left-4">
+
+      {/* Page Title */}
+      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
+        The Memory
+      </div>
+
+      {/* Back Button */}
+      <div className="absolute top-14 sm:top-16 left-4">
         <button
           onClick={() => window.history.back()}
-          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           Go Back
         </button>
       </div>
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Memory</h1>
-      <div ref={mapContainerRef} className="w-full max-w-3xl h-96 rounded-lg shadow-lg mb-6"></div>
+
+      {/* Heading */}
+      <h1 className="text-2xl sm:text-4xl font-semibold mb-4 sm:mb-6 drop-shadow-lg text-center">
+        Memory
+      </h1>
+
+      {/* Map */}
+      <div
+        ref={mapContainerRef}
+        className="w-full h-64 sm:h-96 max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6"
+      ></div>
+
       {/* New Gallery Button */}
       <a
-        href={`../newgallery`}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
+        href="../newgallery"
+        className="fixed bottom-4 sm:bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-2 px-4 sm:py-3 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
       >
         New Gallery
       </a>
-      <div className="absolute top-16 right-4">
-      <a
-        href={`../allgalleries`}
-        className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
-        View All Galleries
-      </a>
+
+      {/* View All Galleries Button */}
+      <div className="absolute top-14 sm:top-20 right-4">
+        <a
+          href="../allgalleries"
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+        >
+          View All Galleries
+        </a>
       </div>
     </div>
   );
