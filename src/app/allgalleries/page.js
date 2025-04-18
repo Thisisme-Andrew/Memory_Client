@@ -1,11 +1,9 @@
 "use client";
 
 import { useSelector, useDispatch } from "react-redux";
-import { useEffect, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
-import { logoutUser } from "../redux/store.js"; // Import logout action
-import { setUser } from "../redux/store.js"; // Redux actions
-import { useSearchParams } from "next/navigation";
+import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { logoutUser, setUser } from "../redux/store.js";
 
 export default function MemoryPage() {
   const user = useSelector((state) => state.auth.user);
@@ -17,65 +15,57 @@ export default function MemoryPage() {
   const lonM = parseFloat(searchParams.get("lon")) || 0;
   const [createdMemories, setCreatedMemories] = useState([]);
   const [collaboratedMemories, setCollaboratedMemories] = useState([]);
-  const [searchQuery, setSearchQuery] = useState(""); // State for search input
-  const [filteredMemories, setFilteredMemories] = useState([]); // State for filtered memories
-  const [userLocation, setUserLocation] = useState({ lat: 0, lon: 0 }); // State for user's location
-  const [loading, setLoading] = useState(true); // State for loading status
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filteredMemories, setFilteredMemories] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-  // Redirect to login if user is not logged in
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser && !isLoggingOut) {
-      router.push("/login"); // If no user, redirect to login
+      router.push("/login");
     } else {
       const userData = JSON.parse(storedUser);
       if (userData) {
-        dispatch(setUser(userData)); // Set the Redux state if user data is available
+        dispatch(setUser(userData));
       }
     }
   }, [router, isLoggingOut, dispatch]);
 
   useEffect(() => {
-    if (user?.userID){
+    if (user?.userID) {
       const fetchMemories = async () => {
         try {
           const response = await fetch(
             `https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/getAllWithCollaboratedByUser?userID=${user.userID}`
           );
           const data = await response.json();
-  
-          // Filter created and collaborated memories based on proximity
-          const closeCreatedMemories = data.createdMemories
-  
-          const closeCollaboratedMemories = data.collaboratedMemories
-  
-          setCreatedMemories(closeCreatedMemories);
-          setCollaboratedMemories(closeCollaboratedMemories);
+
+          setCreatedMemories(data.createdMemories);
+          setCollaboratedMemories(data.collaboratedMemories);
         } catch (error) {
           console.error("Error fetching memories:", error);
         } finally {
-          setLoading(false); // Set loading to false after data is fetched
+          setLoading(false);
         }
       };
-  
+
       fetchMemories();
     }
   }, [latM, lonM, user?.userID]);
 
-  // Function to check if two coordinates are close
-  const areCoordinatesSimilar = (lat1, lon1, lat2, lon2, threshold = 2) => {
-    if (isNaN(lat1) || isNaN(lon1) || isNaN(lat2) || isNaN(lon2)) return false;
-    const latDiff = Math.abs(lat1 - lat2);
-    const lonDiff = Math.abs(lon1 - lon2);
-    return latDiff < threshold && lonDiff < threshold;
-  };
-
-  // Handle search input change
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
-  // Filter memories by memoryID based on search query
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       const searchMemoryID = parseInt(searchQuery);
@@ -90,33 +80,11 @@ export default function MemoryPage() {
         ...filteredCollaboratedMemories,
       ]);
     } else {
-      setFilteredMemories([]); // Reset search if query is empty
+      setFilteredMemories([]);
     }
   }, [searchQuery, createdMemories, collaboratedMemories]);
 
-  // Get user's current location using geolocation
-  useEffect(() => {
-    if (latM === 0 && lonM === 0) {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          (position) => {
-            const { latitude, longitude } = position.coords;
-            setUserLocation({ lat: latitude, lon: longitude });
-          },
-          (error) => {
-            console.error("Error getting location", error);
-            // Default to a specific location if geolocation fails
-            setUserLocation({ lat: 0, lon: 0 });
-          }
-        );
-      }
-    } else {
-      setUserLocation({ lat: latM, lon: lonM });
-    }
-  }, [latM, lonM]);
-
-  // Render memory section
-  const renderMemories = (memories, title) => (
+  const renderMemories = (memories, title) =>
     memories.length > 0 && (
       <div className="w-full max-w-2xl mb-10">
         <h2 className="text-2xl font-semibold mb-4">{title}</h2>
@@ -143,18 +111,15 @@ export default function MemoryPage() {
           </div>
         ))}
       </div>
-    )
-  );
+    );
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
-      {/* Profile Picture */}
+      {/* Initials Badge */}
       <a href="/profile" className="absolute top-4 right-4">
-        <img
-          src="https://via.placeholder.com/50"
-          alt="Profile"
-          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
-        />
+        <div className="w-12 h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
+          {getInitials(user?.fullName)}
+        </div>
       </a>
 
       {/* "The Memory" Text */}
@@ -172,7 +137,6 @@ export default function MemoryPage() {
         </button>
       </div>
 
-      {/* Page Header */}
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">
         All Memories
       </h1>
@@ -188,32 +152,23 @@ export default function MemoryPage() {
         />
       </div>
 
-      {/* Display Loading Spinner */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
         </div>
       )}
 
-      {/* Display User's Location */}
-      <p className="text-white mb-4">
-        <strong>Your Location:</strong> Latitude: {userLocation.lat}, Longitude: {userLocation.lon}
-      </p>
-
-      {/* Memory Sections */}
       {searchQuery.trim() === "" ? (
         <>
           {renderMemories(createdMemories, "Your Memories")}
           {renderMemories(collaboratedMemories, "Collaborated Memories")}
         </>
+      ) : filteredMemories.length === 0 ? (
+        <p className="text-lg text-white">
+          No matching memory found for ID: {searchQuery}
+        </p>
       ) : (
-        <>
-          {filteredMemories.length === 0 ? (
-            <p className="text-lg text-white">No matching memory found for ID: {searchQuery}</p>
-          ) : (
-            renderMemories(filteredMemories, "Search Results")
-          )}
-        </>
+        renderMemories(filteredMemories, "Search Results")
       )}
 
       {/* New Gallery Button */}
@@ -224,7 +179,7 @@ export default function MemoryPage() {
         New Gallery
       </a>
 
-      {/* Footer (Copyright info) */}
+      {/* Footer */}
       <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
         &copy; {new Date().getFullYear()} The Memory. All rights reserved.
       </footer>

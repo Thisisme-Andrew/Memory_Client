@@ -16,6 +16,16 @@ export default function CalgaryPage() {
   const mapContainerRef = useRef(null);
   const [map, setMap] = useState(null);
 
+  // Helper to extract initials from full name
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser && !isLoggingOut) {
@@ -101,14 +111,12 @@ export default function CalgaryPage() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
-      
-      {/* Profile Image */}
+
+      {/* Initials Avatar Link to Profile */}
       <a href="/profile" className="absolute top-4 right-4">
-        <img
-          src="https://via.placeholder.com/50"
-          alt="Profile"
-          className="w-9 h-9 sm:w-12 sm:h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
-        />
+        <div className="w-9 h-9 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
+          {getInitials(user?.fullName)}
+        </div>
       </a>
 
       {/* Page Title */}

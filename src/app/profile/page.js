@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
-import { logoutUser, setUser } from "../redux/store.js"; // Redux actions
+import { logoutUser, setUser } from "../redux/store.js";
 
 export default function Profile() {
   const user = useSelector((state) => state.auth.user);
@@ -12,7 +12,6 @@ export default function Profile() {
   const router = useRouter();
   const [profileData, setProfileData] = useState(null);
   const [error, setError] = useState(null);
-  const defaultProfilePic = "https://picsum.photos/200";
 
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
@@ -62,24 +61,37 @@ export default function Profile() {
     router.push("/homePage");
   };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-8">
-      <h1 className="text-3xl font-semibold text-gray-800 mb-4">User Profile</h1>
-      <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-sm">
-        <img
-          src={user?.profilePic || defaultProfilePic}
-          alt="Profile"
-          className="w-32 h-32 rounded-full object-cover mb-4 mx-auto"
-        />
-        <h2 className="text-xl font-bold text-center mb-1">{user?.fullName || "Guest User"}</h2>
-        <p className="text-center text-gray-500 mb-1">{user?.email || "No email available"}</p>
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
 
-        {/* 🆔 Display UID Here */}
+  return (
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
+      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome Back</h1>
+
+      <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md text-center">
+        {/* Initials Avatar */}
+        <div className="w-24 h-24 mx-auto mb-4 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-lg">
+          {getInitials(user?.fullName)}
+        </div>
+
+        <h2 className="text-2xl font-semibold text-gray-800 mb-1">
+          {user?.fullName || "Guest User"}
+        </h2>
+        <p className="text-gray-500 mb-2">{user?.email || "No email available"}</p>
+
         {user?.userID && (
-          <p className="text-center text-sm text-gray-400 mb-4">
+          <p className="text-sm text-gray-400 mb-6">
             UID: <span className="font-mono">{user.userID}</span>
           </p>
         )}
+
+        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
 
         <div className="flex justify-center gap-4">
           <button
