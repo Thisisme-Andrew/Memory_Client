@@ -200,7 +200,7 @@ export default function gallerysettings() {
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid} Settings</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery Settings</h1>
       
       {(!isLoading &&
         <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">

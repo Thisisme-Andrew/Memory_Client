@@ -95,7 +95,7 @@ export default function MemoryPage() {
               href={`../galleryview?memid=${memory.memoryID}`}
             >
               {/* Display the memory name instead of the ID */}
-              Memory: {memory.name}
+              {memory.name}
             </a>
             <div className="w-full overflow-x-auto custom-scrollbar">
               <div className="flex space-x-4 min-w-max">
