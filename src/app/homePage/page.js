@@ -92,13 +92,13 @@ export default function CalgaryPage() {
       });
 
       memories.forEach((memory) => {
-        const { memoryID, latitude, longitude } = memory;
+        const { memoryID, latitude, longitude, name } = memory;
         if (latitude && longitude) {
           const marker = L.marker(
             [parseFloat(latitude), parseFloat(longitude)],
             { icon: starIcon }
           )
-            .bindPopup(`<b>Memory ID: ${memoryID}</b><br>Click to view`)
+            .bindTooltip(`<b>${name}</b><br>Click to view`)
             .on("click", () =>
               router.push(`/calgary?lat=${latitude}&lon=${longitude}`)
             );

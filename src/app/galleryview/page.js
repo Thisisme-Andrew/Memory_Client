@@ -14,6 +14,7 @@ export default function GalleryView() {
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
   const [images, setImages] = useState([]);
+  const [title, setTitle] = useState("");
   const [creator, setCreator] = useState(null);
   const [collaborators, setCollaborators] = useState(null);
   const [isPublic, setIsPublic] = useState(false);
@@ -58,6 +59,7 @@ export default function GalleryView() {
         setCollaborators(data.collaborators);
         setCreator(data.creatorID);
         setIsPublic(!data.isPrivate);
+        setTitle(data.name);
         if (data.imageURLs.length > 0) {
           setSelectedImage(0);
         }
@@ -192,7 +194,7 @@ export default function GalleryView() {
         </button>
       </div>
 
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid}</h1>
+      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">{title}</h1>
 
       <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
         {/* Sidebar Buttons */}

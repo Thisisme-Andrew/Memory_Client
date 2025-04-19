@@ -91,7 +91,8 @@ export default function MemoryPage() {
               className="text-lg sm:text-xl font-semibold text-white mb-4 text-left w-full"
               href={`../galleryview?memid=${memory.memoryID}`}
             >
-              Memory: {memory.name}
+              {/* Display the memory name instead of the ID */}
+              {memory.name}
             </a>
             <div className="w-full overflow-x-auto custom-scrollbar">
               <div className="flex space-x-4 min-w-max">
