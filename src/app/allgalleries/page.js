@@ -75,10 +75,7 @@ export default function MemoryPage() {
       const filteredCollaboratedMemories = collaboratedMemories.filter(
         (memory) => memory.memoryID === searchMemoryID
       );
-      setFilteredMemories([
-        ...filteredCreatedMemories,
-        ...filteredCollaboratedMemories,
-      ]);
+      setFilteredMemories([filteredCreatedMemories, filteredCollaboratedMemories].flat());
     } else {
       setFilteredMemories([]);
     }
@@ -86,15 +83,14 @@ export default function MemoryPage() {
 
   const renderMemories = (memories, title) =>
     memories.length > 0 && (
-      <div className="w-full max-w-2xl mb-10">
-        <h2 className="text-2xl font-semibold mb-4">{title}</h2>
+      <div className="w-full max-w-2xl mb-10 px-4 sm:px-0">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-4">{title}</h2>
         {memories.map((memory) => (
           <div key={memory.memoryID} className="w-full mb-6">
             <a
-              className="text-2xl font-semibold text-white mb-4 text-left w-full"
+              className="text-lg sm:text-xl font-semibold text-white mb-4 text-left w-full"
               href={`../galleryview?memid=${memory.memoryID}`}
             >
-              {/* Display the memory name instead of the ID */}
               Memory: {memory.name}
             </a>
             <div className="w-full overflow-x-auto custom-scrollbar">
@@ -104,7 +100,7 @@ export default function MemoryPage() {
                     key={index}
                     src={url}
                     alt={`Memory ${memory.memoryID} - Image ${index}`}
-                    className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
+                    className="w-36 sm:w-48 h-36 sm:h-48 rounded-lg shadow-lg border-2 border-white"
                   />
                 ))}
               </div>
@@ -115,16 +111,16 @@ export default function MemoryPage() {
     );
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
       {/* Initials Badge */}
       <a href="/profile" className="absolute top-4 right-4">
-        <div className="w-12 h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
           {getInitials(user?.fullName)}
         </div>
       </a>
 
       {/* "The Memory" Text */}
-      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
+      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
         The Memory
       </div>
 
@@ -132,30 +128,31 @@ export default function MemoryPage() {
       <div className="absolute top-16 left-4">
         <button
           onClick={() => window.history.back()}
-          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+          className="bg-white text-blue-600 py-1 px-3 rounded-full text-sm font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           Go Back
         </button>
       </div>
 
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">
+      <h1 className="text-3xl sm:text-4xl font-semibold mb-6 drop-shadow-lg">
         All Memories
       </h1>
+{/* Search Box */}
+<div className="bg-white text-blue-600 shadow-lg rounded-lg p-2 sm:p-3 w-full max-w-xs sm:max-w-md text-center mb-6">
+  <input
+    type="text"
+    placeholder="Search by Memory ID..."
+    value={searchQuery}
+    onChange={handleSearchChange}
+    className="w-full p-2 sm:p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
+  />
+</div>
 
-      {/* Search Box */}
-      <div className="bg-white text-blue-600 shadow-lg rounded-lg p-4 w-full max-w-lg text-center mb-6">
-        <input
-          type="text"
-          placeholder="Search by Memory ID..."
-          value={searchQuery}
-          onChange={handleSearchChange}
-          className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
-      </div>
+
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
-          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+          <div className="animate-spin rounded-full h-12 sm:h-16 w-12 sm:w-16 border-t-4 border-blue-500"></div>
         </div>
       )}
 
@@ -165,7 +162,7 @@ export default function MemoryPage() {
           {renderMemories(collaboratedMemories, "Collaborated Memories")}
         </>
       ) : filteredMemories.length === 0 ? (
-        <p className="text-lg text-white">
+        <p className="text-sm sm:text-lg text-white">
           No matching memory found for ID: {searchQuery}
         </p>
       ) : (
@@ -181,7 +178,7 @@ export default function MemoryPage() {
       </a>
 
       {/* Footer */}
-      <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
+      <footer className="absolute bottom-6 left-4 text-xs sm:text-sm opacity-80 text-white">
         &copy; {new Date().getFullYear()} The Memory. All rights reserved.
       </footer>
     </div>
