@@ -15,13 +15,13 @@ export default function GalleryView() {
   const currentid = parseInt(searchParams.get("memid"));
   const [images, setImages] = useState([]);
   const [creator, setCreator] = useState(null);
-  const [collaborators, setCollaborators] = useState([]);
+  const [collaborators, setCollaborators] = useState(null);
   const [isPublic, setIsPublic] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageFiles, setImageFiles] = useState([])
 
   useEffect(() => {
-    if (creator === null) return;
+    if ((creator === null) || (collaborators === null)) return;
     const storedUser = sessionStorage.getItem("user");
 
     if (!storedUser && !isLoggingOut) {
@@ -32,7 +32,7 @@ export default function GalleryView() {
         dispatch(setUser(userData)); // Set the Redux state if user data is available
       }
       console.log(userData);
-      if (!isPublic && (!(userData.userID === creator) || collaborators.includes(userData.userID))) router.push("/homePage"); 
+      if (!isPublic && userData.userID !== creator && !collaborators.includes(userData.userID)) router.push("/homePage"); 
   }
 }, [router, isLoggingOut, dispatch, creator, isPublic, collaborators]);
 
@@ -189,7 +189,7 @@ export default function GalleryView() {
       <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
         {/* Sidebar Buttons */}
         <div className="flex flex-col space-y-4">
-          {(((user?.userID === creator) || collaborators.includes(user?.userID)) &&
+          {((collaborators !== null) && (((user?.userID === creator) || collaborators.includes(user?.userID))) &&
           <div className="flex space-x-4">
             <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
               Add Images
