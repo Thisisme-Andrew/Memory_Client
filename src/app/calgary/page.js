@@ -82,21 +82,22 @@ export default function MemoryPage() {
   // Filter memories by memoryID based on search query
   useEffect(() => {
     if (searchQuery.trim() !== "") {
-      const searchMemoryID = parseInt(searchQuery);
+      const queryLower = searchQuery.toLowerCase();
       const filteredCreatedMemories = createdMemories.filter(
-        (memory) => memory.memoryID === searchMemoryID
+        (memory) => memory.name?.toLowerCase().includes(queryLower)
       );
       const filteredCollaboratedMemories = collaboratedMemories.filter(
-        (memory) => memory.memoryID === searchMemoryID
+        (memory) => memory.name?.toLowerCase().includes(queryLower)
       );
       setFilteredMemories([
         ...filteredCreatedMemories,
         ...filteredCollaboratedMemories,
       ]);
     } else {
-      setFilteredMemories([]); // Reset search if query is empty
+      setFilteredMemories([]);
     }
   }, [searchQuery, createdMemories, collaboratedMemories]);
+  
 
   // Get user's current location using geolocation
   useEffect(() => {
@@ -120,7 +121,7 @@ export default function MemoryPage() {
   }, [latM, lonM]);
 
   // Render memory section
-  const renderMemories = (memories, title) => (
+  const renderMemories = (memories, title) =>
     memories.length > 0 && (
       <div className="w-full max-w-2xl mb-10">
         <h2 className="text-2xl font-semibold mb-4">{title}</h2>
@@ -130,7 +131,7 @@ export default function MemoryPage() {
               className="text-2xl font-semibold text-white mb-4 text-left w-full"
               href={`../galleryview?memid=${memory.memoryID}`}
             >
-              Memory ID: {memory.memoryID}
+              {memory.name || `Untitled Memory (${memory.memoryID})`}
             </a>
             <div className="w-full overflow-x-auto custom-scrollbar">
               <div className="flex space-x-4 min-w-max">
@@ -138,7 +139,7 @@ export default function MemoryPage() {
                   <img
                     key={index}
                     src={url}
-                    alt={`Memory ${memory.memoryID} - Image ${index}`}
+                    alt={`Memory ${memory.name} - Image ${index}`}
                     className="w-48 h-48 rounded-lg shadow-lg border-2 border-white"
                   />
                 ))}
@@ -147,8 +148,8 @@ export default function MemoryPage() {
           </div>
         ))}
       </div>
-    )
-  );
+    );
+  
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
