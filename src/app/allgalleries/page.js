@@ -125,11 +125,12 @@ export default function MemoryPage() {
         The Memory
       </div>
 
-      {/* Go Back Button */}
-      <div className="absolute top-16 left-4">
+
+      {/* Back Button */}
+      <div className="absolute top-14 sm:top-16 left-4">
         <button
           onClick={() => window.history.back()}
-          className="bg-white text-blue-600 py-1 px-3 rounded-full text-sm font-semibold shadow-lg hover:bg-gray-100 transition"
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
           Go Back
         </button>
@@ -138,17 +139,16 @@ export default function MemoryPage() {
       <h1 className="text-3xl sm:text-4xl font-semibold mb-6 drop-shadow-lg">
         All Memories
       </h1>
-{/* Search Box */}
-<div className="bg-white text-blue-600 shadow-lg rounded-lg p-2 sm:p-3 w-full max-w-xs sm:max-w-md text-center mb-6">
-  <input
-    type="text"
-    placeholder="Search by Memory ID..."
-    value={searchQuery}
-    onChange={handleSearchChange}
-    className="w-full p-2 sm:p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm sm:text-base"
-  />
-</div>
-
+    {/* Search Box */}
+    <div className="bg-white text-blue-600 shadow-lg rounded-lg p-1 sm:p-2 w-full max-w-[200px] sm:max-w-xs text-center mb-6">
+      <input
+        type="text"
+        placeholder="Search by Memory ID..."
+        value={searchQuery}
+        onChange={handleSearchChange}
+        className="w-full p-1 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-base"
+      />
+    </div>
 
 
       {loading && (
