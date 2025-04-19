@@ -20,6 +20,16 @@ export default function GalleryView() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageFiles, setImageFiles] = useState([])
 
+
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+  
   useEffect(() => {
     if ((creator === null) || (collaborators === null)) return;
     const storedUser = sessionStorage.getItem("user");
@@ -163,11 +173,9 @@ export default function GalleryView() {
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative overflow-x-hidden">
       {((user !== null) &&
       <a href="/profile" className="absolute top-4 right-4">
-        <img
-          src="https://via.placeholder.com/50"
-          alt="Profile"
-          className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
-        />
+        <div className="w-9 h-9 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
+          {getInitials(user?.fullName)}
+        </div>
       </a>
       )}
 

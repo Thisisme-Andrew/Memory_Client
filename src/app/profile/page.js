@@ -55,10 +55,15 @@ export default function Profile() {
   }, [user?.userID]);
 
   const handleLogout = () => {
-    setIsLoggingOut(true);
     sessionStorage.removeItem("user");
     dispatch(logoutUser());
-    setShowReloginMessage(true);  // Show the notification message
+    router.push("/login");
+  };
+
+  const handleLogoutAfterUpdate = () => {
+    sessionStorage.removeItem("user");
+    dispatch(logoutUser());
+    setShowReloginMessage(true);
   };
 
   const handleGoHome = () => {
@@ -66,6 +71,11 @@ export default function Profile() {
   };
 
   const handleSaveChanges = async () => {
+    if (firstName.trim().length < 1 || lastName.trim().length < 1) {
+      setError("First and Last name must be at least 1 character long.");
+      return;
+    }
+
     const updatedUserData = {
       firstName,
       lastName,
@@ -92,14 +102,9 @@ export default function Profile() {
       const data = await response.json();
       console.log("Updated User Data:", data);
 
-      // Update session storage with the updated user data immediately
       sessionStorage.setItem("user", JSON.stringify(data));
-
-      // Update Redux store with the updated user data
       dispatch(setUser(data));
-
-      // Force the user to log out and log back in to reflect changes
-      handleLogout();  // Log out immediately after saving changes
+      handleLogoutAfterUpdate();
     } catch (err) {
       console.error("Error saving changes:", err);
       setError("Failed to save changes.");
@@ -120,7 +125,6 @@ export default function Profile() {
       <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome Back</h1>
 
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md text-center">
-        {/* Initials Avatar */}
         <div className="w-24 h-24 mx-auto mb-4 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-lg">
           {getInitials(user?.fullName)}
         </div>
@@ -132,12 +136,14 @@ export default function Profile() {
               value={firstName}
               onChange={(e) => setFirstName(e.target.value)}
               className="text-lg font-semibold text-gray-800 mb-2 w-full p-2 border border-gray-300 rounded"
+              placeholder="First Name"
             />
             <input
               type="text"
               value={lastName}
               onChange={(e) => setLastName(e.target.value)}
               className="text-lg font-semibold text-gray-800 mb-2 w-full p-2 border border-gray-300 rounded"
+              placeholder="Last Name"
             />
             <button
               onClick={handleSaveChanges}
@@ -182,10 +188,9 @@ export default function Profile() {
           </>
         )}
 
-        {error && <p className="text-red-500 text-sm mb-4">{error}</p>}
+        {error && <p className="text-red-500 text-sm mt-4">{error}</p>}
       </div>
 
-      {/* Relogin Notification */}
       {showReloginMessage && (
         <div className="fixed top-0 left-0 right-0 bg-red-600 text-white text-center py-3">
           <p>Your information has been updated. Please log in again.</p>
