@@ -14,6 +14,7 @@ export default function gallerysettings() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
+  const [isLoading, setIsLoading] = useState(true);
 
   // Title
   const [title, setTitle] = useState("Untitled Gallery");
@@ -38,62 +39,68 @@ export default function gallerysettings() {
   const saveChanges = async () => {
     try {
 
-      await fetch(
-        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editTitle",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            memoryID: currentid,
-            title: newTitle
-          }),
-        }
-      );
-      console.log('Title Updated');
+      if (newTitle !== title) {
+        await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editTitle",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              memoryID: currentid,
+              title: newTitle
+            }),
+          }
+        );
+        console.log('Title Updated');
+      }
 
+      if ((latitude !== newLatitude) || (longitude !== newLongitude)) {
+        await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editLongitudeLatitude",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              memoryID: currentid,
+              longitude: parseFloat(newLongitude),
+              latitude: parseFloat(newLatitude)
+            }),
+          }
+        );
+        console.log('Coordinates Updated');
+      }
 
-      await fetch(
-        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editLongitudeLatitude",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            memoryID: currentid,
-            longitude: parseFloat(newLongitude),
-            latitude: parseFloat(newLatitude)
-          }),
-        }
-      );
+      if (toRemove.length) {
+        await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/removeCollaborators",
+          {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              memoryID: currentid,
+              collaborators: toRemove
+            }),
+          }
+        );
+        console.log('Collaborators Removed');
+      }
 
-      console.log('Coordinates Updated');
+      if (newCollaborators.length) {
+        await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/addCollaborators",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              memoryID: currentid,
+              collaborators: newCollaborators
+            }),
+          }
+        );
+    
+        console.log('Collaborators Added');
+      }
 
-      await fetch(
-        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/removeCollaborators",
-        {
-          method: "DELETE",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            memoryID: currentid,
-            collaborators: toRemove
-          }),
-        }
-      );
-
-      console.log('Collaborators Removed');
-
-      await fetch(
-        "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/addCollaborators",
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            memoryID: currentid,
-            collaborators: newCollaborators
-          }),
-        }
-      );
-  
-      console.log('Collaborators Added');
       router.push(`/galleryview?memid=${currentid}`);
     } catch (error) {
       console.error('Error saving changes:', error);
@@ -115,7 +122,7 @@ export default function gallerysettings() {
         );
     
         console.log('Memory Deleted');
-        router.push(`/allgalleries`);
+        router.push(`/homePage`);
       } catch (error) {
         console.error('Error deleting gallery:', error)
       }
@@ -156,6 +163,7 @@ export default function gallerysettings() {
         console.log("user from Redux:", user);
         if (data.creatorID !== user.userID) router.push("/homePage");
         setCollaborators(data.collaborators);
+        setIsLoading(false);
       } catch (error) {
         console.error("Error fetching memory:", error);
       }
@@ -194,105 +202,106 @@ export default function gallerysettings() {
       {/* Page Header */}
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery {currentid} Settings</h1>
       
+      {(!isLoading &&
+        <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">
+          <div className="flex w-full flex-col space-y-4">
 
-      <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">
-        <div className="flex w-full flex-col space-y-4">
+              {/* Gallery Title */}
+              <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Title</h2>
+              <input
+              type="text"
+              placeholder={title}
+              onChange={(e) => setNewTitle(e.target.value)}
+              className="border border-gray-300 rounded px-4 py-2 w-full text-black"
+              />
 
-            {/* Gallery Title */}
-            <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Title</h2>
-            <input
-            type="text"
-            placeholder={title}
-            onChange={(e) => setNewTitle(e.target.value)}
-            className="border border-gray-300 rounded px-4 py-2 w-full text-black"
-            />
+              {/* Gallery Coordinates */}
+              <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Coordinates</h2>
+              <div className="flex w-full space-x-4">
 
-            {/* Gallery Coordinates */}
-            <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Coordinates</h2>
-            <div className="flex w-full space-x-4">
+                {/* Latitude */}
+                <div className="flex flex-col w-full">
+                  <h2 className="text-1xl font-semibold drop-shadow-lg">Latitude</h2>
+                  <input
+                  type="text"
+                  defaultValue={newLatitude}
+                  placeholder={latitude}
+                  onChange={(e) => setNewLatitude(e.target.value)}
+                  className="border border-gray-300 rounded px-4 py-2 w-full text-black"
+                  />
+                </div>
 
-              {/* Latitude */}
-              <div className="flex flex-col w-full">
-                <h2 className="text-1xl font-semibold drop-shadow-lg">Latitude</h2>
-                <input
-                type="text"
-                defaultValue={newLatitude}
-                placeholder={latitude}
-                onChange={(e) => setNewLatitude(e.target.value)}
-                className="border border-gray-300 rounded px-4 py-2 w-full text-black"
-                />
+                {/* Longitude */}
+                <div className="flex flex-col w-full">
+                  <h2 className="text-1xl font-semibold drop-shadow-lg">Longitude</h2>
+                  <input
+                  type="text"
+                  defaultValue={newLongitude}
+                  placeholder={longitude}
+                  onChange={(e) => setNewLongitude(e.target.value)}
+                  className="border border-gray-300 rounded px-4 py-2 w-full text-black"
+                  />
+                </div>
               </div>
 
-              {/* Longitude */}
-              <div className="flex flex-col w-full">
-                <h2 className="text-1xl font-semibold drop-shadow-lg">Longitude</h2>
-                <input
-                type="text"
-                defaultValue={newLongitude}
-                placeholder={longitude}
-                onChange={(e) => setNewLongitude(e.target.value)}
-                className="border border-gray-300 rounded px-4 py-2 w-full text-black"
-                />
+              {/* Gallery Members */}
+              <h2 className="text-2xl font-semibold drop-shadow-lg">Members</h2>
+              <div className="w-full h-40 overflow-y-auto border border-white-300 rounded px-4 py-2 space-y-2 custom-scrollbar">
+                  
+                  {/* Owner */}
+                  <div className="flex justify-between items-center">
+                      <span className="text-white">User {owner}</span>
+                      <h3 className="px-4 py-2 text-center w-[190px]">Owner</h3>
+                  </div>
+
+                  {/* Original Collaborators */}
+                  {collaborators.filter(collaborator => !toRemove.includes(collaborator)).map((collaborator) => (
+                  <div className="flex justify-between items-center" key={`original-${collaborator}`}>
+                      <span className="text-white">User {collaborator}</span>
+                      <button 
+                      className="border border-white px-4 py-2 rounded text-white text-center bg-transparent shadow-lg hover:bg-white hover:text-blue-600 transition"
+                      onClick={() => setToRemove((prev) => (prev.includes(collaborator) ? prev : [...prev, collaborator]))}>
+                          Remove Collaborator
+                      </button>
+                  </div>
+                  ))}
+
+                  {/* Added Collaborators */}
+                  {newCollaborators.map((collaborator) => (
+                  <div className="flex justify-between items-center" key={`new-${collaborator}`}>
+                      <span className="text-white">User {collaborator}</span>
+                      <button 
+                      className="border border-white px-4 py-2 rounded text-white text-center bg-transparent shadow-lg hover:bg-white hover:text-blue-600 transition"
+                      onClick={() => setNewCollaborators(prev => prev.filter(c => c !== collaborator))}>
+                          Remove Collaborator
+                      </button>
+                  </div>
+                  ))}   
               </div>
-            </div>
+              <button 
+                className="bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+                onClick={() => setShowAddCollaboratorsModal(true)}>
+                  Add Collaborators
+              </button>
 
-            {/* Gallery Members */}
-            <h2 className="text-2xl font-semibold drop-shadow-lg">Members</h2>
-            <div className="w-full h-40 overflow-y-auto border border-white-300 rounded px-4 py-2 space-y-2 custom-scrollbar">
-                
-                {/* Owner */}
-                <div className="flex justify-between items-center">
-                    <span className="text-white">User {owner}</span>
-                    <h3 className="px-4 py-2 text-center w-[190px]">Owner</h3>
-                </div>
+              {/* Save Changes and Cancel Buttons */}
+              <div className="flex w-full space-x-4">
+                  <button className="w-1/2 bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition" onClick={() => saveChanges()}>
+                      Save Changes and Exit
+                  </button>
+                  <button className="w-1/2 bg-transparent text-white border border-white px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/galleryview?memid=${currentid}`)}>
+                      Exit Without Saving
+                  </button>
+              </div>
+          </div>
 
-                {/* Original Collaborators */}
-                {collaborators.filter(collaborator => !toRemove.includes(collaborator)).map((collaborator) => (
-                <div className="flex justify-between items-center" key={`original-${collaborator}`}>
-                    <span className="text-white">User {collaborator}</span>
-                    <button 
-                    className="border border-white px-4 py-2 rounded text-white text-center bg-transparent shadow-lg hover:bg-white hover:text-blue-600 transition"
-                    onClick={() => setToRemove((prev) => (prev.includes(collaborator) ? prev : [...prev, collaborator]))}>
-                        Remove Collaborator
-                    </button>
-                </div>
-                ))}
+          <button className="self-end mt-2 bg-red-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-red-700 transition" onClick={() => deleteGallery()}>
+              Delete Gallery
+          </button>
 
-                {/* Added Collaborators */}
-                {newCollaborators.map((collaborator) => (
-                <div className="flex justify-between items-center" key={`new-${collaborator}`}>
-                    <span className="text-white">User {collaborator}</span>
-                    <button 
-                    className="border border-white px-4 py-2 rounded text-white text-center bg-transparent shadow-lg hover:bg-white hover:text-blue-600 transition"
-                    onClick={() => setNewCollaborators(prev => prev.filter(c => c !== collaborator))}>
-                        Remove Collaborator
-                    </button>
-                </div>
-                ))}   
-            </div>
-            <button 
-              className="bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
-              onClick={() => setShowAddCollaboratorsModal(true)}>
-                Add Collaborators
-            </button>
 
-            {/* Save Changes and Cancel Buttons */}
-            <div className="flex w-full space-x-4">
-                <button className="w-1/2 bg-white text-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-gray-100 transition" onClick={() => saveChanges()}>
-                    Save Changes and Exit
-                </button>
-                <button className="w-1/2 bg-transparent text-white border border-white px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/galleryview?memid=${currentid}`)}>
-                    Exit Without Saving
-                </button>
-            </div>
         </div>
-
-        <button className="self-end mt-2 bg-red-600 text-white px-4 py-2 text-sm rounded shadow hover:bg-red-700 transition" onClick={() => deleteGallery()}>
-            Delete Gallery
-        </button>
-
-
-      </div>
+      )}
 
 
       {showAddCollaboratorsModal && (
