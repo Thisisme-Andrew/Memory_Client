@@ -14,22 +14,30 @@ export default function GalleryView() {
   const router = useRouter();
   const currentid = parseInt(searchParams.get("memid"));
   const [images, setImages] = useState([]);
+  const [creator, setCreator] = useState(null);
+  const [collaborators, setCollaborators] = useState([]);
+  const [isPublic, setIsPublic] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageFiles, setImageFiles] = useState([])
 
   useEffect(() => {
+    if (creator === null) return;
     const storedUser = sessionStorage.getItem("user");
+
     if (!storedUser && !isLoggingOut) {
-      router.push("/login"); // If no user, redirect to login
+      if (!isPublic) router.push("/login"); // If no user, redirect to login
     } else {
       const userData = JSON.parse(storedUser);
       if (userData) {
         dispatch(setUser(userData)); // Set the Redux state if user data is available
-    }
+      }
+      console.log(userData);
+      if (!isPublic && (!(userData.userID === creator) || collaborators.includes(userData.userID))) router.push("/homePage"); 
   }
-}, [router, isLoggingOut, dispatch]);
+}, [router, isLoggingOut, dispatch, creator, isPublic, collaborators]);
 
   useEffect(() => {
+
     // Fetch memories from the database
     const fetchMemory = async () => {
       try {
@@ -37,6 +45,9 @@ export default function GalleryView() {
         const data = await response.json();
         
         setImages(data.imageURLs);
+        setCollaborators(data.collaborators);
+        setCreator(data.creatorID);
+        setIsPublic(!data.isPrivate);
         if (data.imageURLs.length > 0) {
           setSelectedImage(0);
         }
@@ -150,6 +161,7 @@ export default function GalleryView() {
 
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative overflow-x-hidden">
+      {((user !== null) &&
       <a href="/profile" className="absolute top-4 right-4">
         <img
           src="https://via.placeholder.com/50"
@@ -157,6 +169,7 @@ export default function GalleryView() {
           className="w-12 h-12 rounded-full border-2 border-white shadow-lg hover:opacity-80 transition-opacity"
         />
       </a>
+      )}
 
       <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
         The Memory
@@ -176,18 +189,26 @@ export default function GalleryView() {
       <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
         {/* Sidebar Buttons */}
         <div className="flex flex-col space-y-4">
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
-            Add Images
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleRemovePhoto()}>
-            Remove Image
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
-            Gallery Settings
-          </button>
-          <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => navigator.clipboard.writeText(window.location.href)}>
-            Share Gallery
-          </button>
+          {(((user?.userID === creator) || collaborators.includes(user?.userID)) &&
+          <div className="flex space-x-4">
+            <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
+              Add Images
+            </button>
+            <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleRemovePhoto()}>
+              Remove Image
+            </button>
+          </div>
+          )}
+          {((user?.userID === creator) &&
+            <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
+              Gallery Settings
+            </button>
+          )}
+          {(isPublic &&
+            <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => navigator.clipboard.writeText(window.location.href)}>
+              Share Gallery
+            </button>
+          )}
         </div>
 
         {/* Main Content */}

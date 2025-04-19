@@ -135,6 +135,8 @@ export default function gallerysettings() {
   }, [router, isLoggingOut, dispatch]);
 
   useEffect(() => {
+    if (user === null) return;
+
     // Fetch memory from the database
     const fetchMemory = async () => {
       try {
@@ -150,6 +152,9 @@ export default function gallerysettings() {
         setLongitude(data.longitude);
         setNewLongitude(data.longitude);
         setOwner(data.creatorID);
+        console.log("creatorID from API:", data.creatorID);
+        console.log("user from Redux:", user);
+        if (data.creatorID !== user.userID) router.push("/homePage");
         setCollaborators(data.collaborators);
       } catch (error) {
         console.error("Error fetching memory:", error);
@@ -157,7 +162,7 @@ export default function gallerysettings() {
     };
 
     fetchMemory();
-  }, []);
+  }, [user, currentid]);
 
 
   return (
