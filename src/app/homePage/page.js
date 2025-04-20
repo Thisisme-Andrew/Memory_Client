@@ -100,7 +100,7 @@ export default function CalgaryPage() {
           )
             .bindTooltip(`<b>${name}</b><br>Click to view`)
             .on("click", () =>
-              router.push(`/calgary?lat=${latitude}&lon=${longitude}`)
+              router.push(`/galleryview?memid=${memoryID}`)
             );
 
           marker.addTo(map);

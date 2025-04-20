@@ -68,12 +68,12 @@ export default function MemoryPage() {
 
   useEffect(() => {
     if (searchQuery.trim() !== "") {
-      const searchMemoryID = parseInt(searchQuery);
+      const searchMemoryTitle = searchQuery;
       const filteredCreatedMemories = createdMemories.filter(
-        (memory) => memory.memoryID === searchMemoryID
+        (memory) => memory.name?.toLowerCase().includes(searchMemoryTitle.toLowerCase())
       );
       const filteredCollaboratedMemories = collaboratedMemories.filter(
-        (memory) => memory.memoryID === searchMemoryID
+        (memory) => memory.name?.toLowerCase().includes(searchMemoryTitle.toLowerCase())
       );
       setFilteredMemories([filteredCreatedMemories, filteredCollaboratedMemories].flat());
     } else {
@@ -92,7 +92,7 @@ export default function MemoryPage() {
               href={`../galleryview?memid=${memory.memoryID}`}
             >
               {/* Display the memory name instead of the ID */}
-              {memory.name}
+              {memory.name?.trim() ? memory.name : "Untitled Gallery"}
             </a>
             <div className="w-full overflow-x-auto custom-scrollbar">
               <div className="flex space-x-4 min-w-max">
@@ -100,6 +100,8 @@ export default function MemoryPage() {
                   <img
                     key={index}
                     src={url}
+                    onClick={() => router.push(`/galleryview?memid=${memory.memoryID}`)}
+                    style={{cursor: "pointer"}}
                     alt={`Memory ${memory.memoryID} - Image ${index}`}
                     className="w-36 sm:w-48 h-36 sm:h-48 rounded-lg shadow-lg border-2 border-white"
                   />
@@ -143,7 +145,7 @@ export default function MemoryPage() {
     <div className="bg-white text-blue-600 shadow-lg rounded-lg p-1 sm:p-2 w-full max-w-[200px] sm:max-w-xs text-center mb-6">
       <input
         type="text"
-        placeholder="Search by Memory ID..."
+        placeholder="Search by Memory Title..."
         value={searchQuery}
         onChange={handleSearchChange}
         className="w-full p-1 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-base"
@@ -164,7 +166,7 @@ export default function MemoryPage() {
         </>
       ) : filteredMemories.length === 0 ? (
         <p className="text-sm sm:text-lg text-white">
-          No matching memory found for ID: {searchQuery}
+          No matching memory found for title: {searchQuery}
         </p>
       ) : (
         renderMemories(filteredMemories, "Search Results")

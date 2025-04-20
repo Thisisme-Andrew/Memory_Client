@@ -196,13 +196,13 @@ export default function GalleryView() {
 
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">{title}</h1>
 
-      <div className="flex w-full max-w-6xl items-start space-x-8 overflow-x-hidden flex-wrap">
+      <div className="flex w-full max-w-6xl items-center space-x-8 overflow-x-hidden">
         {/* Sidebar Buttons */}
         <div className="flex flex-col space-y-4">
           {((collaborators !== null) && (((user?.userID === creator) || collaborators.includes(user?.userID))) &&
           <div className="flex space-x-4">
             <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
-              Add Images
+              Add<br/>Images
             </button>
             <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleRemovePhoto()}>
               Remove Image
@@ -222,39 +222,39 @@ export default function GalleryView() {
         </div>
 
         {/* Main Content */}
-        <div key={currentid} className="flex space-x-2 overflow-x-hidden">
-            {/* Main Selected Image */}
-            <div className="flex items-center justify-center">
-            <div className="border-4 border-white rounded-lg shadow-xl -mt-28">
-            {typeof selectedImage === "number" && (
-              <img
-                src={images[selectedImage]}
-                alt="Selected Memory"
-                className="rounded-md max-w-[500px] max-h-[500px] w-full h-full object-contain block"
-              />
-            )}
+        <div key={currentid} className="flex space-x-2 overflow-x-hidden items-center min-h-[500px]">
+          {/* Main Selected Image */}
+          <div className="flex items-center justify-center h-[500px]">
+            <div className="border-4 border-white rounded-lg shadow-xl">
+              {typeof selectedImage === "number" && (
+                <img
+                  src={images[selectedImage]}
+                  alt="Selected Memory"
+                  className="rounded-md max-w-[500px] max-h-[500px] w-full h-full object-contain block"
+                />
+              )}
+            </div>
           </div>
-        </div>
 
 
-            {/* Scrollable Thumbnails */}
-            <div className="w-40 h-[500px]">
-              <div className="space-y">
-                {images.map((url, index) => (
-                  <img
-                    key={index}
-                    src={url}
-                    alt={`Thumbnail ${index}`}
-                    onClick={() => setSelectedImage(index)}
-                    className={`w-auto h-auto rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
-                    selectedImage === index ? "border-yellow-400 scale-105" : "border-white"
-                    }`}
-                  />
-                ))}
-              </div>
+          {/* Scrollable Thumbnails */}
+          <div className="w-40 h-[500px] overflow-y-auto custom-scrollbar pr-1">
+            <div className="flex flex-col space-y-2">
+              {images.map((url, index) => (
+                <img
+                  key={index}
+                  src={url}
+                  alt={`Thumbnail ${index}`}
+                  onClick={() => setSelectedImage(index)}
+                  className={`w-auto h-auto rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
+                  selectedImage === index ? "border-yellow-400" : "border-white scale-95"
+                  }`}
+                />
+              ))}
             </div>
           </div>
         </div>
+      </div>
 
       <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
         &copy; {new Date().getFullYear()} The Memory. All rights reserved.
