@@ -156,7 +156,8 @@ export default function NewGalleryPage() {
   };
   
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative">
+<div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 pt-40 relative">
+
       <div className="absolute top-16 left-4">
         <button
           onClick={() => window.history.back()}
