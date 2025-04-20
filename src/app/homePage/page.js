@@ -66,7 +66,7 @@ export default function CalgaryPage() {
     const initializedMap = L.map(mapContainerRef.current, {
       center: [51.0447, -114.0719],
       zoom: 4,
-      minZoom: 3,
+      minZoom: 2,
       maxZoom: 10,
       worldCopyJump: true,
     });
@@ -127,22 +127,22 @@ export default function CalgaryPage() {
       {/* Back Button */}
       <div className="absolute top-14 sm:top-16 left-4">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => router.push("/allgalleries")}
           className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
-          Go Back
+          List View
         </button>
       </div>
 
       {/* Heading */}
       <h1 className="text-2xl sm:text-4xl font-semibold mb-4 sm:mb-6 drop-shadow-lg text-center">
-        Memory
+        Galleries
       </h1>
 
       {/* Map */}
       <div
         ref={mapContainerRef}
-        className="w-full h-64 sm:h-96 max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6"
+        className="w-full h-[70vh] sm:h-[70vh] max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6"
       ></div>
 
       {/* New Gallery Button */}
@@ -152,16 +152,6 @@ export default function CalgaryPage() {
       >
         New Gallery
       </a>
-
-      {/* View All Galleries Button */}
-      <div className="absolute top-14 sm:top-20 right-4">
-        <a
-          href="../allgalleries"
-          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
-        >
-          View All Galleries
-        </a>
-      </div>
     </div>
   );
 }

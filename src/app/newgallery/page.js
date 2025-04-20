@@ -21,6 +21,15 @@ export default function NewGalleryPage() {
 
   const router = useRouter();
 
+  const getInitials = (name) => {
+    if (!name) return "?";
+    return name
+      .split(" ")
+      .map((part) => part[0])
+      .join("")
+      .toUpperCase();
+  };
+
   useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
       if (!storedUser && !isLoggingOut) {
@@ -154,20 +163,32 @@ export default function NewGalleryPage() {
   
     return `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}`;
   };
-  
-  return (
-<div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 pt-40 relative">
 
-      <div className="absolute top-16 left-4">
+  return (
+<div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 pt-[100px] relative">
+
+      {/* Initials Badge */}
+      <a href="/profile" className="absolute top-4 right-4">
+        <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
+          {getInitials(user?.fullName)}
+        </div>
+      </a>
+
+      {/* "The Memory" Text */}
+      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
+        The Memory
+      </div>
+
+      <div className="absolute top-14 sm:top-16 left-4">
         <button
-          onClick={() => window.history.back()}
-          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+          onClick={() => router.push("/homePage")}
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
-          Go Back
+          Galleries
         </button>
       </div>
 
-      <h1 className="text-4xl font-semibold mb-6">Create New Memory</h1>
+      <h1 className="text-4xl font-semibold mb-6">Create New Gallery</h1>
 
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
@@ -179,7 +200,7 @@ export default function NewGalleryPage() {
         {/* Memory Name */}
         <div className="mb-4">
           <label className="block text-lg font-semibold mb-2" htmlFor="name">
-            Memory Name
+            Gallery Name
           </label>
           <input
             type="text"
@@ -187,7 +208,7 @@ export default function NewGalleryPage() {
             value={name}
             onChange={(e) => setName(e.target.value)}
             className="w-full p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            placeholder="Enter memory name"
+            placeholder="Enter gallery name"
             required
           />
         </div>
@@ -222,7 +243,7 @@ export default function NewGalleryPage() {
           <label className="block text-lg font-semibold mb-2">Location</label>
           <div className="flex space-x-4">
             <input
-              type="number"
+              type="text"
               placeholder="Latitude"
               value={latitude}
               onChange={(e) => setLatitude(e.target.value)}
@@ -230,7 +251,7 @@ export default function NewGalleryPage() {
               required
             />
             <input
-              type="number"
+              type="text"
               placeholder="Longitude"
               value={longitude}
               onChange={(e) => setLongitude(e.target.value)}
@@ -273,7 +294,7 @@ export default function NewGalleryPage() {
             type="submit"
             className="w-full py-3 bg-blue-600 text-white rounded-lg font-semibold shadow-lg hover:bg-blue-700 transition"
           >
-            Create Memory
+            Create Gallery
           </button>
         </div>
       </form>

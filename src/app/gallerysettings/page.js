@@ -192,25 +192,25 @@ export default function gallerysettings() {
       </a>
 
       {/* "The Memory" Text */}
-      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
+      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
         The Memory
       </div>
 
       {/* Go Back Button */}
-      <div className="absolute top-16 left-4">
+      <div className="absolute top-14 sm:top-16 left-4">
         <button
-          onClick={() => window.history.back()} // Go back to the previous page
-          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+          onClick={() => router.push(`/homePage`)} // Go back to the previous page
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
-          Go Back
+          Galleries
         </button>
       </div>
 
       {/* Page Header */}
-      <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">Gallery Settings</h1>
+      <h1 className="text-4xl font-semibold mb-6 mt-20 drop-shadow-lg">Gallery Settings</h1>
       
       {(!isLoading &&
-        <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8">
+        <div className="flex flex-col w-full max-w-4xl items-center space-x-8 space-y-8 mb-10">
           <div className="flex w-full flex-col space-y-4">
 
               {/* Gallery Title */}

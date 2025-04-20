@@ -20,6 +20,8 @@ export default function GalleryView() {
   const [isPublic, setIsPublic] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [imageFiles, setImageFiles] = useState([])
+  const [isMobile, setIsMobile] = useState(false);
+  const [message, setMessage] = useState(null);
 
 
   const getInitials = (name) => {
@@ -46,6 +48,21 @@ export default function GalleryView() {
       if (!isPublic && userData.userID !== creator && !collaborators.includes(userData.userID)) router.push("/homePage"); 
   }
 }, [router, isLoggingOut, dispatch, creator, isPublic, collaborators]);
+
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth <= 768);
+    };
+
+    // Initial check
+    handleResize();
+
+    // Listen for screen resizes
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup on unmount
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
 
@@ -137,6 +154,7 @@ export default function GalleryView() {
         if (selectedImage === null) {
           setSelectedImage(0);
         } else setSelectedImage(images.length);
+        setMessage("Image(s) Successfully Added!");
         setImageFiles([]);
       } catch (error) {
         console.error("Error uploading images:", error);
@@ -146,115 +164,197 @@ export default function GalleryView() {
 
   const handleRemovePhoto = async () => {
     if (selectedImage !== null) {
-      try {
-        const removalResponse = await fetch(
-          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/removeImages",
-          {
-            method: "DELETE",
-            headers: {"Content-Type": "application/json"},
-            body: JSON.stringify({
-              memoryID: currentid,
-              imageURLs: [images[selectedImage]]
-            }),
-          }
-        );
-        const removalData = await removalResponse.json();
-        console.log("Image removed:", removalData);
-        setImages(prev => prev.filter(c => c !== images[selectedImage]));
-        if (images.length === 1) {
-          setSelectedImage(null);
-        } else if (selectedImage === (images.length - 1)) setSelectedImage(selectedImage - 1);
+      if (confirm("Are you sure you want to remove the selected image?")) {
+        try {
+          const removalResponse = await fetch(
+            "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/removeImages",
+            {
+              method: "DELETE",
+              headers: {"Content-Type": "application/json"},
+              body: JSON.stringify({
+                memoryID: currentid,
+                imageURLs: [images[selectedImage]]
+              }),
+            }
+          );
+          const removalData = await removalResponse.json();
+          console.log("Image removed:", removalData);
+          setImages(prev => prev.filter(c => c !== images[selectedImage]));
+          if (images.length === 1) {
+            setSelectedImage(null);
+          } else if (selectedImage === (images.length - 1)) setSelectedImage(selectedImage - 1);
+          setMessage("Image Successfully Removed!");
 
-      } catch (error) {
-        console.error("Error removing image:", error);
+        } catch (error) {
+          console.error("Error removing image:", error);
+        }
       }
     }
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 relative overflow-x-hidden">
-      {((user !== null) &&
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
+      {(user !== null) ?
       <a href="/profile" className="absolute top-4 right-4">
         <div className="w-9 h-9 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
           {getInitials(user?.fullName)}
         </div>
       </a>
-      )}
+      :
+      <div className="absolute flex top-5 right-4 space-x-2">
+        <button
+          onClick={() => router.push("/signup")}
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+        >
+          Sign Up
+        </button>
+        <button
+          onClick={() => router.push("/login")}
+          className="bg-transparent text-white border border-white py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition"
+        >
+          Log In
+        </button>
+      </div>}
 
-      <div className="absolute top-4 left-4 text-2xl font-semibold text-white">
+      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
         The Memory
       </div>
 
-      <div className="absolute top-16 left-4">
+      {((user !== null) &&
+      <div className="absolute top-14 sm:top-16 left-4">
         <button
-          onClick={() => window.history.back()}
-          className="bg-white text-blue-600 py-2 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
+          onClick={() => router.push("/homePage")}
+          className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
-          Go Back
+          Galleries
         </button>
       </div>
+      )}
 
       <h1 className="text-4xl font-semibold mb-6 drop-shadow-lg">{title}</h1>
 
-      <div className="flex w-full max-w-6xl items-center space-x-8 overflow-x-hidden">
-        {/* Sidebar Buttons */}
-        <div className="flex flex-col space-y-4">
-          {((collaborators !== null) && (((user?.userID === creator) || collaborators.includes(user?.userID))) &&
-          <div className="flex space-x-4">
-            <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
-              Add<br/>Images
-            </button>
-            <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleRemovePhoto()}>
-              Remove Image
-            </button>
+      {!isMobile ?
+        <div className="flex w-full max-w-6xl items-center space-x-8 overflow-x-hidden">
+          {/* Sidebar Buttons */}
+          <div className="flex flex-col space-y-4">
+            {((collaborators !== null) && (((user?.userID === creator) || collaborators.includes(user?.userID))) &&
+            <div className="flex space-x-4">
+              <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleAddPhotos()}>
+                Add<br/>Images
+              </button>
+              <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => handleRemovePhoto()}>
+                Remove Image
+              </button>
+            </div>
+            )}
+            {((user?.userID === creator) &&
+              <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
+                Gallery Settings
+              </button>
+            )}
+            {(isPublic &&
+              <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => {navigator.clipboard.writeText(window.location.href); setMessage("Gallery Link Copied to Clipboard!")}}>
+                Share Gallery
+              </button>
+            )}
           </div>
-          )}
-          {((user?.userID === creator) &&
-            <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
-              Gallery Settings
-            </button>
-          )}
-          {(isPublic &&
-            <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => navigator.clipboard.writeText(window.location.href)}>
-              Share Gallery
-            </button>
-          )}
-        </div>
 
-        {/* Main Content */}
-        <div key={currentid} className="flex space-x-2 overflow-x-hidden items-center min-h-[500px]">
-          {/* Main Selected Image */}
-          <div className="flex items-center justify-center h-[500px]">
-            <div className="border-4 border-white rounded-lg shadow-xl">
-              {typeof selectedImage === "number" && (
-                <img
-                  src={images[selectedImage]}
-                  alt="Selected Memory"
-                  className="rounded-md max-w-[500px] max-h-[500px] w-full h-full object-contain block"
-                />
-              )}
+          {/* Main Content */}
+          <div key={currentid} className="flex space-x-2 overflow-x-hidden items-center min-h-[500px]">
+            {/* Main Selected Image */}
+            <div className="flex items-center justify-center h-[500px]">
+              <div className="border-4 border-white rounded-lg shadow-xl">
+                {typeof selectedImage === "number" && (
+                  <img
+                    src={images[selectedImage]}
+                    alt="Selected Memory"
+                    className="rounded-md max-w-[500px] max-h-[500px] w-full h-full object-contain block"
+                  />
+                )}
+              </div>
+            </div>
+
+
+            {/* Scrollable Thumbnails */}
+            <div className="w-40 h-[500px] overflow-y-auto custom-scrollbar pr-1">
+              <div className="flex flex-col space-y-2">
+                {images.map((url, index) => (
+                  <img
+                    key={index}
+                    src={url}
+                    alt={`Thumbnail ${index}`}
+                    onClick={() => setSelectedImage(index)}
+                    className={`w-auto h-auto rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
+                    selectedImage === index ? "border-yellow-400" : "border-white scale-95"
+                    }`}
+                  />
+                ))}
+              </div>
             </div>
           </div>
-
-
-          {/* Scrollable Thumbnails */}
-          <div className="w-40 h-[500px] overflow-y-auto custom-scrollbar pr-1">
-            <div className="flex flex-col space-y-2">
+        </div>
+      : 
+        <div className="flex flex-col w-full max-w-6xl items-center overflow-x-hidden py-1">
+          {/* Thumbnails */}
+          <div className="w-full overflow-x-auto custom-scrollbar px-1 mb-1">
+            <div className="flex space-x-1">
               {images.map((url, index) => (
                 <img
                   key={index}
                   src={url}
                   alt={`Thumbnail ${index}`}
                   onClick={() => setSelectedImage(index)}
-                  className={`w-auto h-auto rounded-lg border-2 shadow-md cursor-pointer transition-transform duration-200 ${
-                  selectedImage === index ? "border-yellow-400" : "border-white scale-95"
+                  className={`h-[60px] rounded border-2 cursor-pointer transition-transform duration-200 ${
+                    selectedImage === index ? "border-yellow-400" : "border-white scale-95"
                   }`}
                 />
               ))}
             </div>
           </div>
-        </div>
-      </div>
+
+          {/* Selected Image */}
+          <div className="flex items-center justify-center h-[300px] mb-1">
+            <div className="border-4 border-white rounded shadow">
+              {typeof selectedImage === "number" && (
+                <img
+                  src={images[selectedImage]}
+                  alt="Selected Memory"
+                  className="rounded max-w-[300px] max-h-[300px] w-full h-full object-contain block"
+                />
+              )}
+            </div>
+          </div>
+
+          {/* Buttons */}
+          <div className="flex flex-col gap-1 w-full px-1 space-y-2">
+            {(collaborators !== null &&
+              ((user?.userID === creator) || collaborators.includes(user?.userID))) && (
+              <div className="flex gap-2">
+                <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={handleAddPhotos}>
+                  Add Images
+                </button>
+                <button className="w-1/2 bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={handleRemovePhoto}>
+                  Remove Image
+                </button>
+              </div>
+            )}
+            {(user?.userID === creator) && (
+              <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => router.push(`/gallerysettings?memid=${currentid}`)}>
+                Gallery Settings
+              </button>
+            )}
+            {isPublic && (
+              <button className="bg-transparent border-2 border-white text-white py-2 px-4 rounded-lg shadow-lg hover:bg-white hover:text-blue-600 transition" onClick={() => {navigator.clipboard.writeText(window.location.href); setMessage("Gallery Link Copied to Clipboard!")}}>
+                Share Gallery
+              </button>
+            )}
+          </div>
+        </div>}
+
+        {/* Status Message */}
+        {message && (
+          <p className="mt-4 text-lg font-semibold text-white">{message}</p>
+        )}
 
       <footer className="absolute bottom-6 left-4 text-sm opacity-80 text-white">
         &copy; {new Date().getFullYear()} The Memory. All rights reserved.

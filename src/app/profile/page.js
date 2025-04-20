@@ -121,8 +121,8 @@ export default function Profile() {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-gray-100 to-gray-200 p-8">
-      <h1 className="text-4xl font-bold text-gray-800 mb-6">Welcome Back</h1>
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8">
+      <h1 className="text-4xl font-bold text-white drop-shadow-lg mb-6">Welcome Back</h1>
 
       <div className="bg-white shadow-2xl rounded-2xl p-8 w-full max-w-md text-center">
         <div className="w-24 h-24 mx-auto mb-4 bg-blue-600 text-white rounded-full flex items-center justify-center text-3xl font-bold shadow-lg">
@@ -165,24 +165,24 @@ export default function Profile() {
               </p>
             )}
 
-            <div className="flex justify-center gap-4">
-              <button
-                onClick={handleLogout}
-                className="bg-red-500 text-white py-2 px-6 rounded hover:bg-red-600 transition"
-              >
-                Logout
-              </button>
+            <div className="flex flex-col justify-center gap-4">
               <button
                 onClick={handleGoHome}
-                className="bg-blue-500 text-white py-2 px-6 rounded hover:bg-blue-600 transition"
+                className="bg-blue-600 text-white border border-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-blue-600 transition"
               >
-                Go to Home
+                Galleries
               </button>
               <button
                 onClick={() => setIsEditing(true)}
-                className="bg-yellow-500 text-white py-2 px-6 rounded hover:bg-yellow-600 transition"
+                className="bg-white text-blue-600 border border-blue-600 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-blue-600 hover:text-white transition"
               >
                 Edit Name
+              </button>
+              <button
+                onClick={handleLogout}
+                className="bg-red-700 text-white border border-red-700 px-6 py-3 rounded text-lg font-semibold shadow-lg hover:bg-white hover:text-red-700 transition"
+              >
+                Log Out
               </button>
             </div>
           </>

@@ -83,7 +83,7 @@ export default function MemoryPage() {
 
   const renderMemories = (memories, title) =>
     memories.length > 0 && (
-      <div className="w-full max-w-2xl mb-10 px-4 sm:px-0">
+      <div className="w-full max-w-2xl mb-5 px-4 sm:px-0">
         <h2 className="text-2xl sm:text-3xl font-semibold mb-4">{title}</h2>
         {memories.map((memory) => (
           <div key={memory.memoryID} className="w-full mb-6">
@@ -131,21 +131,21 @@ export default function MemoryPage() {
       {/* Back Button */}
       <div className="absolute top-14 sm:top-16 left-4">
         <button
-          onClick={() => window.history.back()}
+          onClick={() => router.push("/homePage")}
           className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
         >
-          Go Back
+          Map View
         </button>
       </div>
 
-      <h1 className="text-3xl sm:text-4xl font-semibold mb-6 drop-shadow-lg">
-        All Memories
+      <h1 className="text-3xl sm:text-4xl font-semibold mb-6 mt-20 drop-shadow-lg">
+        Galleries
       </h1>
     {/* Search Box */}
     <div className="bg-white text-blue-600 shadow-lg rounded-lg p-1 sm:p-2 w-full max-w-[200px] sm:max-w-xs text-center mb-6">
       <input
         type="text"
-        placeholder="Search by Memory Title..."
+        placeholder="Search by Gallery Title..."
         value={searchQuery}
         onChange={handleSearchChange}
         className="w-full p-1 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500 text-xs sm:text-base"
@@ -161,12 +161,12 @@ export default function MemoryPage() {
 
       {searchQuery.trim() === "" ? (
         <>
-          {renderMemories(createdMemories, "Your Memories")}
-          {renderMemories(collaboratedMemories, "Collaborated Memories")}
+          {renderMemories(createdMemories, "Your Galleries")}
+          {renderMemories(collaboratedMemories, "Collaborated Galleries")}
         </>
       ) : filteredMemories.length === 0 ? (
         <p className="text-sm sm:text-lg text-white">
-          No matching memory found for title: {searchQuery}
+          No matching gallery found for title: {searchQuery}
         </p>
       ) : (
         renderMemories(filteredMemories, "Search Results")
@@ -175,7 +175,7 @@ export default function MemoryPage() {
       {/* New Gallery Button */}
       <a
         href={`../newgallery`}
-        className="fixed bottom-6 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
+        className="fixed bottom-12 left-1/2 transform -translate-x-1/2 bg-blue-600 text-white py-3 px-6 rounded-full text-lg font-semibold shadow-lg hover:bg-blue-700 transition duration-300"
       >
         New Gallery
       </a>
