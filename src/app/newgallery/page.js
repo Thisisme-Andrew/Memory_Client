@@ -5,6 +5,8 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "../redux/store.js"; // Import logout action
 import { setUser } from "../redux/store.js"; // Redux actions
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function NewGalleryPage() {
   const user = useSelector((state) => state.auth.user);
@@ -12,12 +14,17 @@ export default function NewGalleryPage() {
   const [isLoggingOut, setIsLoggingOut] = useState(false);
   const [name, setName] = useState("");
   const [isPrivate, setIsPrivate] = useState(false);
-  const [latitude, setLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
   const [collaborators, setCollaborators] = useState([]);
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const mapContainerRef = useRef(null);
+  const markerRef = useRef(null);
+  const mapRef = useRef(null);
+  const lastSelected = useRef([0,0]);
+  const [map, setMap] = useState(null);
 
   const router = useRouter();
 
@@ -29,6 +36,84 @@ export default function NewGalleryPage() {
       .join("")
       .toUpperCase();
   };
+
+  useEffect(() => {
+    if ((latitude !== null) && (longitude !== null)) lastSelected.current = [latitude, longitude];
+  }, [latitude, longitude])
+
+  useEffect(() => {
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          setLatitude(latitude);
+          setLongitude(longitude);
+        },
+        (error) => {
+          console.error("Error getting location", error);
+          // Default to a specific location if geolocation fails
+          setLatitude(0);
+          setLongitude(0);
+        }
+      );
+    } else {
+      setLatitude(0);
+      setLongitude(0);
+    }
+ }, [])
+
+  useEffect(() => {
+    if (latitude === null || longitude === null || mapRef.current) return;
+
+    const map = L.map(mapContainerRef.current, {
+      center: [latitude, longitude],
+      zoom: 17,
+      minZoom: 2,
+      maxZoom: 18,
+      worldCopyJump: true,
+    });
+
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+
+    const starIcon = L.divIcon({
+      className: "leaflet-star-icon",
+      html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    });
+
+    const marker = L.marker([latitude, longitude], {
+      icon: starIcon,
+    }).addTo(map);
+
+    map.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+      lastSelected.current = [lat, lng];
+      marker.setLatLng([lat, lng]);
+      map.setView([lat, lng], 17);
+      setLatitude(lat);
+      setLongitude(lng);
+    });
+
+    map.on("mouseout", () => {
+      if (lastSelected.current) {
+        map.setView(lastSelected.current, 17);
+        marker.setLatLng(lastSelected.current);
+      }
+    });
+
+    mapRef.current = map;
+    markerRef.current = marker;
+
+    setMap(map);
+
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [latitude, longitude]);
 
   useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
@@ -76,8 +161,8 @@ export default function NewGalleryPage() {
         creatorID: user.userID, // Replace with actual user ID
         name: name,
         isPrivate: isPrivate,
-        latitude: parseFloat(latitude),
-        longitude: parseFloat(longitude),
+        latitude: latitude,
+        longitude: longitude,
         collaborators: collaborators,
         imageURLs: [], // Do NOT include imageURLs here
       };
@@ -191,7 +276,7 @@ export default function NewGalleryPage() {
       <h1 className="text-4xl font-semibold mb-6">Create New Gallery</h1>
 
       {loading && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
+        <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-[999]">
           <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
         </div>
       )}
@@ -211,6 +296,12 @@ export default function NewGalleryPage() {
             placeholder="Enter gallery name"
             required
           />
+        </div>
+
+        {/* Coordinates */}
+        <div className="mb-4">
+          <label className="block text-lg font-semibold mb-2">Location (Click to Move Marker)</label>
+          <div ref={mapContainerRef} className="w-full h-[30vh] sm:h-[30vh] max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6 z-0">
         </div>
 
         {/* Privacy Option */}
@@ -238,27 +329,8 @@ export default function NewGalleryPage() {
           </label>
         </div>
 
-        {/* Coordinates */}
-        <div className="mb-4">
-          <label className="block text-lg font-semibold mb-2">Location</label>
-          <div className="flex space-x-4">
-            <input
-              type="text"
-              placeholder="Latitude"
-              value={latitude}
-              onChange={(e) => setLatitude(e.target.value)}
-              className="w-1/2 p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-            <input
-              type="text"
-              placeholder="Longitude"
-              value={longitude}
-              onChange={(e) => setLongitude(e.target.value)}
-              className="w-1/2 p-3 rounded-lg text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
-              required
-            />
-          </div>
+        
+          
         </div>
           {/* Collaborators */}
           <div className="mb-4">
