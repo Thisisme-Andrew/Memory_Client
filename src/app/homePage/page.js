@@ -67,7 +67,7 @@ export default function CalgaryPage() {
       center: [51.0447, -114.0719],
       zoom: 4,
       minZoom: 2,
-      maxZoom: 10,
+      maxZoom: 18,
       worldCopyJump: true,
     });
 

@@ -6,6 +6,8 @@ import { useRouter } from "next/navigation";
 import { logoutUser } from "../redux/store.js"; // Import logout action
 import { setUser } from "../redux/store.js"; // Redux actions
 import { useSearchParams } from "next/navigation";
+import L from "leaflet";
+import "leaflet/dist/leaflet.css";
 
 export default function gallerysettings() {
   const user = useSelector((state) => state.auth.user);
@@ -21,10 +23,10 @@ export default function gallerysettings() {
   const [newTitle, setNewTitle] = useState("");
 
   // Coordinates
-  const [latitude, setLatitude] = useState("");
-  const [newLatitude, setNewLatitude] = useState("");
-  const [longitude, setLongitude] = useState("");
-  const [newLongitude, setNewLongitude] = useState("");
+  const [latitude, setLatitude] = useState(null);
+  const [newLatitude, setNewLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
+  const [newLongitude, setNewLongitude] = useState(null);
 
   // Owner
   const [owner, setOwner] = useState("");
@@ -35,6 +37,13 @@ export default function gallerysettings() {
   const [toRemove, setToRemove] = useState([]);
   const [showAddCollaboratorsModal, setShowAddCollaboratorsModal] = useState(false);
   const [modalCollaborators, setModalCollaborators] = useState([]);
+
+  // Map Stuff
+  const mapContainerRef = useRef(null);
+  const markerRef = useRef(null);
+  const mapRef = useRef(null);
+  const lastSelected = useRef([0,0]);
+  const [map, setMap] = useState(null);
   
   const getInitials = (name) => {
     if (!name) return "?";
@@ -139,6 +148,65 @@ export default function gallerysettings() {
   }
 
   useEffect(() => {
+    if ((newLatitude !== null) && (newLongitude !== null)) lastSelected.current = [newLatitude, newLongitude];
+  }, [newLatitude, newLongitude])
+
+  useEffect(() => {
+    if (newLatitude === null || newLongitude === null || mapRef.current) return;
+  
+    const map = L.map(mapContainerRef.current, {
+      center: [newLatitude, newLongitude],
+      zoom: 17,
+      minZoom: 2,
+      maxZoom: 18,
+      worldCopyJump: true,
+    });
+  
+    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "&copy; OpenStreetMap contributors",
+    }).addTo(map);
+  
+    const starIcon = L.divIcon({
+      className: "leaflet-star-icon",
+      html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    });
+  
+    const marker = L.marker([newLatitude, newLongitude], {
+      icon: starIcon,
+    }).addTo(map);
+  
+    map.on("click", (e) => {
+      const { lat, lng } = e.latlng;
+      lastSelected.current = [lat, lng];
+      if (markerRef.current) markerRef.current.setLatLng([lat, lng]);
+      marker.setLatLng([lat, lng]);
+      map.setView([lat, lng], 17);
+      setNewLatitude(lat);
+      setNewLongitude(lng);
+    });
+
+    markerRef.current = marker;
+  
+    map.on("mouseout", () => {
+      if (lastSelected.current) {
+        map.setView(lastSelected.current, 17);
+        marker.setLatLng(lastSelected.current);
+      }
+    });
+  
+    mapRef.current = map;
+  
+    setMap(map);
+  
+    return () => {
+      map.remove();
+      mapRef.current = null;
+    };
+  }, [newLatitude, newLongitude]);
+
+  useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
       if (!storedUser && !isLoggingOut) {
         router.push("/login"); // If no user, redirect to login
@@ -224,31 +292,9 @@ export default function gallerysettings() {
 
               {/* Gallery Coordinates */}
               <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Coordinates</h2>
-              <div className="flex w-full space-x-4">
-
-                {/* Latitude */}
-                <div className="flex flex-col w-full">
-                  <h2 className="text-1xl font-semibold drop-shadow-lg">Latitude</h2>
-                  <input
-                  type="text"
-                  defaultValue={newLatitude}
-                  placeholder={latitude}
-                  onChange={(e) => setNewLatitude(e.target.value)}
-                  className="border border-gray-300 rounded px-4 py-2 w-full text-black"
-                  />
-                </div>
-
-                {/* Longitude */}
-                <div className="flex flex-col w-full">
-                  <h2 className="text-1xl font-semibold drop-shadow-lg">Longitude</h2>
-                  <input
-                  type="text"
-                  defaultValue={newLongitude}
-                  placeholder={longitude}
-                  onChange={(e) => setNewLongitude(e.target.value)}
-                  className="border border-gray-300 rounded px-4 py-2 w-full text-black"
-                  />
-                </div>
+              <div className="flex flex-col w-full">
+                <label className="block text-lg font-semibold mb-2">Location (Click to Move Marker)</label>
+                <div ref={mapContainerRef} className="w-full h-[30vh] sm:h-[30vh] rounded-lg shadow-lg mb-6 z-0"></div>
               </div>
 
               {/* Gallery Members */}
