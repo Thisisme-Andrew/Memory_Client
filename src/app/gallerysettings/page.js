@@ -28,6 +28,10 @@ export default function gallerysettings() {
   const [longitude, setLongitude] = useState(null);
   const [newLongitude, setNewLongitude] = useState(null);
 
+  // Privacy
+  const [isPrivate, setIsPrivate] = useState(null);
+  const [newIsPrivate, setNewIsPrivate] = useState(null);
+
   // Owner
   const [owner, setOwner] = useState("");
 
@@ -86,6 +90,21 @@ export default function gallerysettings() {
           }
         );
         console.log('Coordinates Updated');
+      }
+
+      if (newIsPrivate !== isPrivate) {
+        await fetch(
+          "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editIsPrivate",
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              memoryID: currentid,
+              isPrivate: newIsPrivate
+            }),
+          }
+        );
+        console.log('Privacy Updated');
       }
 
       if (toRemove.length) {
@@ -235,6 +254,8 @@ export default function gallerysettings() {
         setNewLatitude(data.latitude);
         setLongitude(data.longitude);
         setNewLongitude(data.longitude);
+        setIsPrivate(data.isPrivate);
+        setNewIsPrivate(data.isPrivate);
         setOwner(data.creatorID);
         console.log("creatorID from API:", data.creatorID);
         console.log("user from Redux:", user);
@@ -291,10 +312,32 @@ export default function gallerysettings() {
               />
 
               {/* Gallery Coordinates */}
-              <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Coordinates</h2>
-              <div className="flex flex-col w-full">
-                <label className="block text-lg font-semibold mb-2">Location (Click to Move Marker)</label>
-                <div ref={mapContainerRef} className="w-full h-[30vh] sm:h-[30vh] rounded-lg shadow-lg mb-6 z-0"></div>
+              <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Location (Click to Move Marker)</h2>
+              <div ref={mapContainerRef} className="w-full h-[30vh] sm:h-[30vh] rounded-lg shadow-lg mb-6 z-0"></div>
+
+              {/* Gallery Privacy */}
+              <h2 className="text-2xl font-semibold drop-shadow-lg">Gallery Privacy</h2>
+              <div className="flex w-full">
+                <label className="inline-flex items-center mr-6">
+                  <input
+                    type="radio"
+                    value={false}
+                    checked={!newIsPrivate}
+                    onChange={() => setNewIsPrivate(false)}
+                    className="form-radio text-blue-600"
+                  />
+                  <span className="ml-2">Public</span>
+                </label>
+                <label className="inline-flex items-center">
+                  <input
+                    type="radio"
+                    value={true}
+                    checked={newIsPrivate}
+                    onChange={() => setNewIsPrivate(true)}
+                    className="form-radio text-blue-600"
+                  />
+                  <span className="ml-2">Private</span>
+                </label>
               </div>
 
               {/* Gallery Members */}

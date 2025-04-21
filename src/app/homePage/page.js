@@ -47,9 +47,24 @@ export default function CalgaryPage() {
           );
           const data = await response.json();
 
+          let created = [];
+          let collaborated = [];
+
+          try {
+            created = [...data.createdMemories];
+          } catch (err) {
+            created = [];
+          }
+
+          try {
+            collaborated = [...data.collaboratedMemories];
+          } catch (err) {
+            collaborated = [];
+          }
+
           const allMemories = [
-            ...(data.createdMemories || []),
-            ...(data.collaboratedMemories || []),
+            ...created,
+            ...collaborated,
           ];
 
           setMemories(allMemories);
