@@ -53,6 +53,7 @@ export default function GallerySettings() {
   const lastSelected = useRef([0,0]);
   const [map, setMap] = useState(null);
   
+  {/*initials*/}
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -62,9 +63,11 @@ export default function GallerySettings() {
       .toUpperCase();
   };
 
+  {/* Save Changes */}
   const saveChanges = async () => {
     try {
 
+      {/*Update Title*/}
       if (newTitle !== title) {
         await fetch(
           "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editTitle",
@@ -80,6 +83,7 @@ export default function GallerySettings() {
         console.log('Title Updated');
       }
 
+      {/*Update Coordinates*/}
       if ((latitude !== newLatitude) || (longitude !== newLongitude)) {
         await fetch(
           "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editLongitudeLatitude",
@@ -96,6 +100,7 @@ export default function GallerySettings() {
         console.log('Coordinates Updated');
       }
 
+      {/*Update Privacy*/}
       if (newIsPrivate !== isPrivate) {
         await fetch(
           "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/editIsPrivate",
@@ -111,6 +116,7 @@ export default function GallerySettings() {
         console.log('Privacy Updated');
       }
 
+      {/*Update Collaborators*/}
       if (toRemove.length) {
         await fetch(
           "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/removeCollaborators",
@@ -126,6 +132,7 @@ export default function GallerySettings() {
         console.log('Collaborators Removed');
       }
 
+      {/*Add Collaborators*/}
       if (newCollaborators.length) {
         await fetch(
           "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/addCollaborators",
@@ -148,6 +155,7 @@ export default function GallerySettings() {
     }
   };
 
+  {/* Delete Gallery */}
   const deleteGallery = async () => {
     if (confirm("Are you sure you want to delete this gallery?")) {
       try {
@@ -170,10 +178,12 @@ export default function GallerySettings() {
     }
   }
 
+  {/* Update Map */}
   useEffect(() => {
     if ((newLatitude !== null) && (newLongitude !== null)) lastSelected.current = [newLatitude, newLongitude];
   }, [newLatitude, newLongitude])
 
+  {/* Check if user is logged in */}
   useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
       if (!storedUser && !isLoggingOut) {
@@ -186,6 +196,7 @@ export default function GallerySettings() {
     }
   }, [router, isLoggingOut, dispatch]);
 
+  {/* Check if user is logged in, if not, redirect to login page, authentication checking*/}
   useEffect(() => {
     if (user === null) return;
 
@@ -353,7 +364,7 @@ export default function GallerySettings() {
         </div>
       )}
 
-
+      {/* Add Collaborators Modal */}
       {showAddCollaboratorsModal && (
         <div className="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-50">
           <div className="bg-gradient-to-br from-purple-600 to-blue-500 text-white rounded-lg shadow-xl p-6 w-full max-w-md">

@@ -5,6 +5,7 @@ import { useEffect, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { logoutUser, setUser } from "../redux/store.js";
 
+{/*All Galleries, allows users to view and interact with all galleries*/}
 export default function AllGalleries() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -19,6 +20,7 @@ export default function AllGalleries() {
   const [filteredMemories, setFilteredMemories] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  {/*initials*/}
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -28,6 +30,7 @@ export default function AllGalleries() {
       .toUpperCase();
   };
 
+  {/* Check if user is logged in, if not, redirect to login page, authentication checking*/}
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser && !isLoggingOut) {
@@ -40,6 +43,7 @@ export default function AllGalleries() {
     }
   }, [router, isLoggingOut, dispatch]);
 
+  {/*Fetch User Data*/}
   useEffect(() => {
     if (user?.userID) {
       const fetchMemories = async () => {
@@ -62,10 +66,12 @@ export default function AllGalleries() {
     }
   }, [latM, lonM, user?.userID]);
 
+  {/*Search Functionality*/}
   const handleSearchChange = (e) => {
     setSearchQuery(e.target.value);
   };
 
+  {/*Filter memories based on search query*/}
   useEffect(() => {
     if (searchQuery.trim() !== "") {
       const searchMemoryTitle = searchQuery;
@@ -81,6 +87,7 @@ export default function AllGalleries() {
     }
   }, [searchQuery, createdMemories, collaboratedMemories]);
 
+  {/*Helper function to render memories*/}
   const renderMemories = (memories, title) =>
     memories.length > 0 && (
       <div className="w-full max-w-2xl mb-5 px-4 sm:px-0">
@@ -152,13 +159,14 @@ export default function AllGalleries() {
       />
     </div>
 
-
+      {/* Loading Indicator */}
       {loading && (
         <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50 z-10">
           <div className="animate-spin rounded-full h-12 sm:h-16 w-12 sm:w-16 border-t-4 border-blue-500"></div>
         </div>
       )}
 
+      {/* Memories List */}
       {searchQuery.trim() === "" ? (
         <>
           {renderMemories(createdMemories, "Your Galleries")}
