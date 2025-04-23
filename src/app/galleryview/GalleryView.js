@@ -216,12 +216,8 @@ export default function GalleryView() {
         </button>
       </div>}
 
-      <div className="absolute top-4 left-4 text-lg sm:text-2xl font-semibold text-white">
-        The Memory
-      </div>
-
       {((user !== null) &&
-      <div className="absolute top-14 sm:top-16 left-4">
+      <div className="absolute top-10 sm:top-10 left-4">
         <button
           onClick={() => router.push("/homePage")}
           className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"

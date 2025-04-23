@@ -179,11 +179,6 @@ export default function AllGalleries() {
       >
         New Gallery
       </a>
-
-      {/* Footer */}
-      <footer className="absolute bottom-6 left-4 text-xs sm:text-sm opacity-80 text-white">
-        &copy; {new Date().getFullYear()} The Memory. All rights reserved.
-      </footer>
     </div>
   );
 }
