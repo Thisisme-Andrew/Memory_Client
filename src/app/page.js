@@ -3,6 +3,7 @@ import Link from "next/link";
 
 export default function Home() {
   return (
+    //main container, defines the gradient background and center content
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8">
       <header className="absolute top-6 left-6 text-2xl font-bold">The Memory</header>
       
@@ -11,6 +12,7 @@ export default function Home() {
         <p className="text-lg mb-8 max-w-lg">
           Organize your photos effortlessly by location. Create shared galleries with family and friends to revisit your best moments together.
         </p>
+        
         
         <div className="flex gap-4">
           <Link href="/signup" className="bg-white text-blue-600 px-6 py-3 rounded-full text-lg font-semibold shadow-lg hover:bg-gray-100 transition">
