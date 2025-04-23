@@ -6,10 +6,13 @@ import { useRouter } from "next/navigation";
 import { logoutUser, setUser } from "../redux/store.js";
 import dynamic from "next/dynamic";
 
+{/* import Map from "./map.js"; */}
 const Map = dynamic(() => import("./map.js"), {
   ssr: false,
 })
 
+
+{/*Home Page, this encompasses the main leaflet map and the overlay of the memories in the map*/}
 export default function CalgaryPage() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -29,6 +32,7 @@ export default function CalgaryPage() {
       .toUpperCase();
   };
 
+  {/* Check if user is logged in, if not, redirect to login page, authentication checking*/}
   useEffect(() => {
     const storedUser = sessionStorage.getItem("user");
     if (!storedUser && !isLoggingOut) {
@@ -41,6 +45,7 @@ export default function CalgaryPage() {
     }
   }, [router, isLoggingOut, dispatch]);
 
+  {/*Fetch Memories, get all the created and collaborated memories*/}
   useEffect(() => {
     if (user?.userID) {
       const fetchMemories = async () => {
@@ -81,9 +86,10 @@ export default function CalgaryPage() {
   }, [user?.userID]);
 
   return (
+    //main container, defines the gradient background and center content
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
 
-      {/* Initials Avatar Link to Profile */}
+      {/*Initials Avatar Link to profile*/}
       <a href="/profile" className="absolute top-4 right-4">
         <div className="w-9 h-9 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-sm sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
           {getInitials(user?.fullName)}

@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import { useDispatch } from "react-redux";
 import { setUser } from "../redux/store.js"; // Redux actions
 
+
+//login page, allows users to log in to the app if they have an account in the database
 export default function Login() {
   {/*State Variables For User Input*/}
   const [email, setEmailState] = useState("");

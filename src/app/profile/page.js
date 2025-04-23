@@ -5,6 +5,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { logoutUser, setUser } from "../redux/store.js";
 
+/*Profile Page, allows users to view and edit their profile information*/
 export default function Profile() {
   {/*State Variables For Redux And User Session*/}
   const user = useSelector((state) => state.auth.user);

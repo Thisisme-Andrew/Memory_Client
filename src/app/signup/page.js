@@ -5,6 +5,8 @@ import { useDispatch } from "react-redux";
 import { useRouter } from "next/navigation";
 import { setUser } from "../redux/store.js";
 
+
+//signup page, allows user to create an account, will add to the database
 export default function Signup() {
   {/*State Variables For User Input*/}
   const [fullName, setFullName] = useState("");

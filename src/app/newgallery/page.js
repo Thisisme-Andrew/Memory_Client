@@ -7,11 +7,14 @@ import { logoutUser } from "../redux/store.js"; // Import logout action
 import { setUser } from "../redux/store.js"; // Redux actions
 import dynamic from "next/dynamic";
 
+{/* import Map from "./map.js"; */}
 const Map = dynamic(() => import("./map.js"), {
   ssr: false,
 })
 
+
 export default function NewGalleryPage() {
+  {/*State Variables For Redux And User Session*/}
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
   const [isLoggingOut, setIsLoggingOut] = useState(false);
@@ -31,6 +34,8 @@ export default function NewGalleryPage() {
 
   const router = useRouter();
 
+  
+  {/*initials*/}
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -40,10 +45,12 @@ export default function NewGalleryPage() {
       .toUpperCase();
   };
 
+  {/*last selected marker, IMPORTATNT to store longitude and latitude*/}
   useEffect(() => {
     if ((latitude !== null) && (longitude !== null)) lastSelected.current = [latitude, longitude];
   }, [latitude, longitude])
 
+  {/*Get user location*/}
   useEffect(() => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition(
@@ -65,6 +72,7 @@ export default function NewGalleryPage() {
     }
  }, [])
 
+ {/*Check if user is logged in*/}
   useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
       if (!storedUser && !isLoggingOut) {
@@ -77,46 +85,44 @@ export default function NewGalleryPage() {
     }
   }, [router, isLoggingOut, dispatch]);
 
+  {/*Function to handle image changes*/}
   const handleImageChange = (e) => {
     setImageFiles([...e.target.files]);
   };
 
+  {/*Function to handle collaborator changes*/}
   const handleCollaboratorChange = (e) => {
     const userIds = e.target.value
-      .split(",") // Split input by commas
-      .map((id) => id.trim()) // Trim any extra spaces around the IDs
-      .map((id) => parseInt(id)) // Convert to numbers
-      .filter((id) => !isNaN(id)); // Filter out any non-number values
+      .split(",")
+      .map((id) => id.trim())
+      .map((id) => parseInt(id)) 
+      .filter((id) => !isNaN(id));
   
 
       setCollaborators(userIds);
-    //setCollaborators((prevCollaborators) => {
-      //const newCollaborators = [...new Set([...prevCollaborators, ...userIds])]; // Add new IDs and ensure uniqueness
-      //return newCollaborators;
-    //});
   };
   
-
+{/*Function to handle form submission, calls the API*/}
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage("");
   
     try {
-      // Step 1: Upload images
+
       const imageUrls = await uploadImages(imageFiles);
   
-      // Step 2: Create memory
       const memoryData = {
-        creatorID: user.userID, // Replace with actual user ID
+        creatorID: user.userID, // Use the userID from the Redux store
         name: name,
         isPrivate: isPrivate,
         latitude: latitude,
         longitude: longitude,
         collaborators: collaborators,
-        imageURLs: [], // Do NOT include imageURLs here
+        imageURLs: [],
       };
   
+      {}
       const createResponse = async () => {
         console.log("collabaors object: " + collaborators);
         return await fetch(
@@ -138,7 +144,7 @@ export default function NewGalleryPage() {
       }
   
       // Step 3: Call /addImages with memoryID and imageURLs
-      const uniqueImageUrls = [...new Set(imageUrls)]; // Remove duplicate URLs to avoid breaking the API
+      const uniqueImageUrls = [...new Set(imageUrls)]; //Remove duplicate URLs to avoid breaking the API
   
       const imageResponse = await fetch(
         "https://memories-gebqazega2facsa4.canadacentral-01.azurewebsites.net/api/memories/addImages",
@@ -179,6 +185,7 @@ export default function NewGalleryPage() {
     return urls;
   };
 
+  {/*Function to upload images and return their URLs*/}
   const uploadImageToServer = async (file) => {
     const blobName = `${Date.now()}-${file.name}`;
     const uploadUrl = `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}?${process.env.NEXT_PUBLIC_AZURE_SAS_TOKEN}`;
@@ -200,8 +207,8 @@ export default function NewGalleryPage() {
   };
 
   return (
-<div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 pt-[100px] relative">
-
+    // Main container
+  <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-8 pt-[100px] relative">
       {/* Initials Badge */}
       <a href="/profile" className="absolute top-4 right-4">
         <div className="w-10 h-10 sm:w-12 sm:h-12 bg-white text-blue-600 rounded-full flex items-center justify-center font-bold text-base sm:text-lg shadow-lg border-2 border-white hover:opacity-80 transition-opacity">
@@ -214,6 +221,7 @@ export default function NewGalleryPage() {
         The Memory
       </div>
 
+      {/* Galleries Button */}
       <div className="absolute top-14 sm:top-16 left-4">
         <button
           onClick={() => router.push("/homePage")}
@@ -223,6 +231,7 @@ export default function NewGalleryPage() {
         </button>
       </div>
 
+      {/* "Create New Gallery" Text */}
       <h1 className="text-4xl font-semibold mb-6">Create New Gallery</h1>
 
       {loading && (
@@ -231,6 +240,7 @@ export default function NewGalleryPage() {
         </div>
       )}
 
+      
       <form onSubmit={handleSubmit} className="w-full max-w-lg bg-white text-blue-600 shadow-lg rounded-lg p-6">
         {/* Memory Name */}
         <div className="mb-4">
