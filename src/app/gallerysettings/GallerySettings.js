@@ -12,6 +12,7 @@ const Map = dynamic(() => import("./map.js"), {
   ssr: false,
 })
 
+{/*Gallery Settings, allows users to edit a specific gallery*/}
 export default function GallerySettings() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
