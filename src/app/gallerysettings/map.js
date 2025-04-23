@@ -14,6 +14,8 @@ export default function GalleryMap({ newLatitude, newLongitude, setNewLatitude, 
     const map = L.map(mapContainerRef.current, {
       center: [newLatitude, newLongitude],
       zoom: 17,
+      minZoom: 4,
+      maxZoom: 18,
       worldCopyJump: true,
     });
 

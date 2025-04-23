@@ -10,6 +10,8 @@ export default function MapComponent({ memories, onMarkerClick }) {
     const map = L.map(mapRef.current, {
       center: [51.0447, -114.0719],
       zoom: 4,
+      minZoom: 4,
+      maxZoom: 18
     });
 
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -39,5 +41,5 @@ export default function MapComponent({ memories, onMarkerClick }) {
     };
   }, [memories, onMarkerClick]);
 
-  return <div ref={mapRef} className="w-full h-[70vh] rounded-lg shadow-lg mb-6" />;
+  return <div ref={mapRef} className="w-2/3 h-[70vh] rounded-lg shadow-lg mb-6" />;
 }
