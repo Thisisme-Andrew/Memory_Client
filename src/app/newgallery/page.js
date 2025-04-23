@@ -5,8 +5,11 @@ import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser } from "../redux/store.js"; // Import logout action
 import { setUser } from "../redux/store.js"; // Redux actions
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("./map.js"), {
+  ssr: false,
+})
 
 export default function NewGalleryPage() {
   const user = useSelector((state) => state.auth.user);
@@ -61,59 +64,6 @@ export default function NewGalleryPage() {
       setLongitude(0);
     }
  }, [])
-
-  useEffect(() => {
-    if (latitude === null || longitude === null || mapRef.current) return;
-
-    const map = L.map(mapContainerRef.current, {
-      center: [latitude, longitude],
-      zoom: 17,
-      minZoom: 2,
-      maxZoom: 18,
-      worldCopyJump: true,
-    });
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(map);
-
-    const starIcon = L.divIcon({
-      className: "leaflet-star-icon",
-      html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
-      iconSize: [40, 40],
-      iconAnchor: [20, 20],
-    });
-
-    const marker = L.marker([latitude, longitude], {
-      icon: starIcon,
-    }).addTo(map);
-
-    map.on("click", (e) => {
-      const { lat, lng } = e.latlng;
-      lastSelected.current = [lat, lng];
-      marker.setLatLng([lat, lng]);
-      map.setView([lat, lng], 17);
-      setLatitude(lat);
-      setLongitude(lng);
-    });
-
-    map.on("mouseout", () => {
-      if (lastSelected.current) {
-        map.setView(lastSelected.current, 17);
-        marker.setLatLng(lastSelected.current);
-      }
-    });
-
-    mapRef.current = map;
-    markerRef.current = marker;
-
-    setMap(map);
-
-    return () => {
-      map.remove();
-      mapRef.current = null;
-    };
-  }, [latitude, longitude]);
 
   useEffect(() => {
       const storedUser = sessionStorage.getItem("user");
@@ -301,7 +251,12 @@ export default function NewGalleryPage() {
         {/* Coordinates */}
         <div className="mb-4">
           <label className="block text-lg font-semibold mb-2">Location (Click to Move Marker)</label>
-          <div ref={mapContainerRef} className="w-full h-[30vh] sm:h-[30vh] max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6 z-0">
+          <Map
+            newLatitude={latitude}
+            newLongitude={longitude}
+            setNewLatitude={setLatitude}
+            setNewLongitude={setLongitude}
+          />
         </div>
 
         {/* Privacy Option */}
@@ -331,7 +286,7 @@ export default function NewGalleryPage() {
 
         
           
-        </div>
+
           {/* Collaborators */}
           <div className="mb-4">
             <label className="block text-lg font-semibold mb-2">Collaborators (User IDs)</label>

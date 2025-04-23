@@ -9,7 +9,7 @@ export default function Home() {
       <main className="flex flex-col items-center text-center max-w-2xl">
         <h1 className="text-5xl font-extrabold mb-6 drop-shadow-lg">Preserve & Share Your Memories</h1>
         <p className="text-lg mb-8 max-w-lg">
-          Organize your photos and videos effortlessly by time and location. Create shared Memory spaces with family and friends to revisit your best moments together.
+          Organize your photos effortlessly by location. Create shared galleries with family and friends to revisit your best moments together.
         </p>
         
         <div className="flex gap-4">

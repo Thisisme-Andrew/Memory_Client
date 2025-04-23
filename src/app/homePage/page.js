@@ -4,8 +4,11 @@ import { useSelector, useDispatch } from "react-redux";
 import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { logoutUser, setUser } from "../redux/store.js";
-import L from "leaflet";
-import "leaflet/dist/leaflet.css";
+import dynamic from "next/dynamic";
+
+const Map = dynamic(() => import("./map.js"), {
+  ssr: false,
+})
 
 export default function CalgaryPage() {
   const user = useSelector((state) => state.auth.user);
@@ -77,53 +80,6 @@ export default function CalgaryPage() {
     }
   }, [user?.userID]);
 
-  useEffect(() => {
-    const initializedMap = L.map(mapContainerRef.current, {
-      center: [51.0447, -114.0719],
-      zoom: 4,
-      minZoom: 2,
-      maxZoom: 18,
-      worldCopyJump: true,
-    });
-
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      attribution: "&copy; OpenStreetMap contributors",
-    }).addTo(initializedMap);
-
-    setMap(initializedMap);
-
-    return () => {
-      initializedMap.remove();
-    };
-  }, []);
-
-  useEffect(() => {
-    if (map && memories.length) {
-      const starIcon = L.divIcon({
-        className: "leaflet-star-icon",
-        html: '<div style="font-size: 32px; color: gold;">&#9733;</div>',
-        iconSize: [40, 40],
-        iconAnchor: [20, 20],
-      });
-
-      memories.forEach((memory) => {
-        const { memoryID, latitude, longitude, name } = memory;
-        if (latitude && longitude) {
-          const marker = L.marker(
-            [parseFloat(latitude), parseFloat(longitude)],
-            { icon: starIcon }
-          )
-            .bindTooltip(`<b>${name}</b><br>Click to view`)
-            .on("click", () =>
-              router.push(`/galleryview?memid=${memoryID}`)
-            );
-
-          marker.addTo(map);
-        }
-      });
-    }
-  }, [memories, map, router]);
-
   return (
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
 
@@ -155,10 +111,10 @@ export default function CalgaryPage() {
       </h1>
 
       {/* Map */}
-      <div
-        ref={mapContainerRef}
-        className="w-full h-[70vh] sm:h-[70vh] max-w-full sm:max-w-3xl rounded-lg shadow-lg mb-6"
-      ></div>
+      <Map
+        memories={memories}
+        onMarkerClick={(id) => router.push(`/galleryview?memid=${id}`)}
+      />
 
       {/* New Gallery Button */}
       <a
