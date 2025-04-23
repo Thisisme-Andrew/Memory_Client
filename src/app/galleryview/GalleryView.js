@@ -6,6 +6,8 @@ import { logoutUser } from "../redux/store.js"; // Import logout action
 import { setUser } from "../redux/store.js"; // Redux actions
 import { useSearchParams, useRouter } from "next/navigation";
 
+
+{/*Gallery View, allows users to view and interact with a specific gallery*/}
 export default function GalleryView() {
   const user = useSelector((state) => state.auth.user);
   const dispatch = useDispatch();
@@ -24,6 +26,7 @@ export default function GalleryView() {
   const [message, setMessage] = useState(null);
 
 
+  {/*initials*/}
   const getInitials = (name) => {
     if (!name) return "?";
     return name
@@ -33,23 +36,27 @@ export default function GalleryView() {
       .toUpperCase();
   };
   
+  {/* Check if user is logged in, if not, redirect to login page, authentication checking*/}
   useEffect(() => {
     if ((creator === null) || (collaborators === null)) return;
     const storedUser = sessionStorage.getItem("user");
 
     if (!storedUser && !isLoggingOut) {
-      if (!isPublic) router.push("/login"); // If no user, redirect to login
+      if (!isPublic) router.push("/login"); 
     } else {
       const userData = JSON.parse(storedUser);
       if (userData) {
-        dispatch(setUser(userData)); // Set the Redux state if user data is available
+        dispatch(setUser(userData)); 
       }
       console.log(userData);
       if (!isPublic && userData.userID !== creator && !collaborators.includes(userData.userID)) router.push("/homePage"); 
   }
 }, [router, isLoggingOut, dispatch, creator, isPublic, collaborators]);
 
+
+  
   useEffect(() => {
+    {/* Check if the window width is less than or equal to 768px */}
     const handleResize = () => {
       setIsMobile(window.innerWidth <= 768);
     };
@@ -101,6 +108,7 @@ export default function GalleryView() {
       return urls;
     };
 
+    {/* Function to upload a single image and return its URL */}
   const uploadImageToServer = async (file) => {
     const blobName = `${Date.now()}-${file.name}`;
     const uploadUrl = `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}?${process.env.NEXT_PUBLIC_AZURE_SAS_TOKEN}`;
@@ -121,6 +129,7 @@ export default function GalleryView() {
     return `${process.env.NEXT_PUBLIC_AZURE_BASE_SAS_URL}/${blobName}`;
   };
 
+  {/* Function to handle adding photos */}
   const handleAddPhotos = async() => {
       // Open File Upload Dialog
       let input = document.createElement('input');
@@ -162,6 +171,7 @@ export default function GalleryView() {
     }
   }
 
+  {/* Function to handle removing a photo */}
   const handleRemovePhoto = async () => {
     if (selectedImage !== null) {
       if (confirm("Are you sure you want to remove the selected image?")) {
@@ -193,6 +203,7 @@ export default function GalleryView() {
   }
 
   return (
+    //main container
     <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 to-blue-500 text-white p-4 sm:p-8 relative">
       {(user !== null) ?
       <a href="/profile" className="absolute top-4 right-4">
@@ -202,6 +213,7 @@ export default function GalleryView() {
       </a>
       :
       <div className="absolute flex top-5 right-4 space-x-2">
+        {/*buttons*/}
         <button
           onClick={() => router.push("/signup")}
           className="bg-white text-blue-600 py-1.5 px-4 sm:py-2 sm:px-6 rounded-full text-sm sm:text-lg font-semibold shadow-lg hover:bg-gray-100 transition"
